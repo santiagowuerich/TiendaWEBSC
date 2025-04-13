@@ -8,7 +8,7 @@ import { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import './globals.css';
 import { baseUrl } from 'lib/utils';
-import BranchButton from 'components/branch-button';
+import FloatingBranchButton from 'components/floating-branch-button';
 
 // Configurar la fuente Inter
 const inter = Inter({
@@ -30,9 +30,6 @@ export const metadata = {
     index: true
   }
 };
-
-// Componente de botón flotante que usa cliente
-import FloatingBranchButton from 'components/floating-branch-button';
 
 export default async function RootLayout({
   children

@@ -35,12 +35,12 @@ export function ProductDescription({ product }: { product: any }) {
         <h1 className="mb-5 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white md:text-5xl">{product.title}</h1>
         <div className="mb-4 flex items-center">
           <div className="rounded-xl bg-blue-600 px-6 py-3 text-xl font-bold text-white shadow-md">
-            <Price
-              amount={product.priceRange.maxVariantPrice.amount}
-              currencyCode={product.priceRange.maxVariantPrice.currencyCode}
-            />
-          </div>
+          <Price
+            amount={product.priceRange.maxVariantPrice.amount}
+            currencyCode={product.priceRange.maxVariantPrice.currencyCode}
+          />
         </div>
+      </div>
       </div>
       
       {/* Mostrar descripción del producto */}
