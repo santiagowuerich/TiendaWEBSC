@@ -15,14 +15,11 @@ export const revalidate = 3600; // Revalidar cada hora
 
 // Definir tipo para los parámetros
 type PageProps = {
-  params: Promise<{ handle: string }> | { handle: string };
+  params: { handle: string };
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  // Esperar a que params se resuelva antes de usar sus propiedades
-  const paramsObj = await params;
-  const handle = paramsObj.handle;
-  
+  const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
 
   if (!sanityProduct) return notFound();
@@ -52,10 +49,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductPage({ params }: PageProps) {
-  // Esperar a que params se resuelva antes de usar sus propiedades
-  const paramsObj = await params;
-  const handle = paramsObj.handle;
-  
+  const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
 
   if (!sanityProduct) return notFound();
