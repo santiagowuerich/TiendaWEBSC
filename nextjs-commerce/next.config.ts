@@ -1,4 +1,5 @@
-export default {
+/** @type {import('next').NextConfig} */
+module.exports = {
   experimental: {
     ppr: true,
     inlineCss: true,
@@ -9,13 +10,7 @@ export default {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'cdn.shopify.com',
-        pathname: '/s/files/**'
-      },
-      {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-        pathname: '/images/**'
+        hostname: 'cdn.sanity.io'
       }
     ]
   }

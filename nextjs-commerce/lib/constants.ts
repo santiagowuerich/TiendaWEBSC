@@ -14,10 +14,30 @@ export const defaultSort: SortFilterItem = {
 
 export const sorting: SortFilterItem[] = [
   defaultSort,
-  { title: 'Tendencias', slug: 'trending-desc', sortKey: 'BEST_SELLING', reverse: false }, // asc
-  { title: 'Últimas novedades', slug: 'latest-desc', sortKey: 'CREATED_AT', reverse: true },
-  { title: 'Precio: De menor a mayor', slug: 'price-asc', sortKey: 'PRICE', reverse: false }, // asc
-  { title: 'Precio: De mayor a menor', slug: 'price-desc', sortKey: 'PRICE', reverse: true }
+  {
+    title: 'Más vendidos',
+    slug: 'best-selling',
+    sortKey: 'BEST_SELLING',
+    reverse: false
+  },
+  {
+    title: 'Más nuevos',
+    slug: 'newest',
+    sortKey: 'CREATED_AT',
+    reverse: true
+  },
+  {
+    title: 'Precio: Menor a Mayor',
+    slug: 'price-asc',
+    sortKey: 'PRICE',
+    reverse: false
+  },
+  {
+    title: 'Precio: Mayor a Menor',
+    slug: 'price-desc',
+    sortKey: 'PRICE',
+    reverse: true
+  }
 ];
 
 export const TAGS = {
