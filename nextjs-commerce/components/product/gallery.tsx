@@ -97,6 +97,8 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
             src={validImages[imageIndex]?.src || ''}
             alt={validImages[imageIndex]?.altText || 'Imagen de producto'}
             priority={true}
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcsGJhPQAGAwHAoFyw7AAAAABJRU5ErkJggg=="
             onLoad={() => setIsLoading(false)}
           />
         </div>

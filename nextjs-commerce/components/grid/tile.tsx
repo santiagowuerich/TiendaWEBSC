@@ -39,7 +39,10 @@ export function GridTileImage({
             'transition duration-300 ease-in-out group-hover:scale-105': isInteractive
           })}
           {...props}
-          priority
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcsGJhPQAGAwHAoFyw7AAAAABJRU5ErkJggg=="
+          priority={props.priority}
+          alt={props.alt || "Imagen de producto"}
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center bg-[#eceff0] dark:bg-neutral-900">

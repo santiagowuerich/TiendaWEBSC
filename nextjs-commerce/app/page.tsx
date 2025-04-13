@@ -2,6 +2,8 @@ import { Carousel } from 'components/carousel';
 import { ThreeItemGrid } from 'components/grid/three-items';
 import Footer from 'components/layout/footer';
 
+export const revalidate = 3600; // Revalidar cada hora
+
 export const metadata = {
   description:
     'High-performance ecommerce store built with Next.js, Vercel, and Shopify.',

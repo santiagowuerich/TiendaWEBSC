@@ -5,6 +5,8 @@ import { defaultSort, sorting, SortFilterItem } from 'lib/constants';
 import { getAllProducts, getProductsByCategory, formatSanityProduct, getAllCategories, SanityProduct, FormattedProduct } from 'lib/sanity';
 import { unstable_cache } from 'next/cache';
 
+export const revalidate = 3600; // Revalidar cada hora
+
 export const metadata = {
   title: 'Búsqueda',
   description: 'Busca productos en la tienda'

@@ -11,6 +11,8 @@ import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
 import { getProductBySlug, getAllProducts, formatSanityProduct, FormattedProduct, SanityProduct } from 'lib/sanity';
 import Link from 'next/link';
 
+export const revalidate = 3600; // Revalidar cada hora
+
 // Definir tipo para los parámetros
 type PageProps = {
   params: Promise<{ handle: string }> | { handle: string };
