@@ -1,6 +1,9 @@
+'use client';
+
 import clsx from 'clsx';
 import Image from 'next/image';
 import Label from '../label';
+import { useState } from 'react';
 
 export function GridTileImage({
   isInteractive = true,
@@ -21,32 +24,42 @@ export function GridTileImage({
   const hasValidSrc = props.src && 
     typeof props.src === 'string' && 
     (props.src.startsWith('http') || props.src.startsWith('/'));
+    
+  // Estado para controlar cuando la imagen ha cargado
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <div
       className={clsx(
-        'group flex h-full w-full items-center justify-center overflow-hidden rounded-lg border bg-[#eceff0] hover:border-neutral-400 dark:hover:border-neutral-600 dark:bg-black',
+        'group relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-white dark:bg-black',
         {
-          relative: label,
-          'border-2 border-neutral-500': active,
-          'border-neutral-200 dark:border-neutral-800': !active
+          'ring-2 ring-neutral-00': active
         }
       )}
+      style={{ contain: 'paint' }} // Optimiza la capa de pintura
     >
       {hasValidSrc ? (
-        <Image
-          className={clsx('relative h-full w-full object-cover aspect-square', {
-            'transition duration-300 ease-in-out group-hover:scale-105': isInteractive
-          })}
-          {...props}
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcsGJhPQAGAwHAoFyw7AAAAABJRU5ErkJggg=="
-          priority={props.priority}
-          alt={props.alt || "Imagen de producto"}
-        />
+        <>
+          <div className="h-full w-full py-[100px]">
+            <Image
+              className={clsx('h-full w-full object-cover rounded-lg', {
+                'transition duration-300 ease-in-out group-hover:scale-105': isInteractive,
+                'opacity-100': imageLoaded,
+                'opacity-0': !imageLoaded
+              })}
+              {...props}
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+              priority={props.priority}
+              alt={props.alt || "Imagen de producto"}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </div>
+        </>
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-[#eceff0] dark:bg-neutral-900">
-          <span className="text-sm text-neutral-500">Sin imagen</span>
+        <div className="flex h-full w-full items-center justify-center">
+          <span className="text-sm text-neutral-
+          00">Sin imagen</span>
         </div>
       )}
       {label ? (

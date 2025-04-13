@@ -18,7 +18,7 @@ function getSearchParams(paramsObj: Record<string, string | string[] | undefined
     sort: typeof paramsObj.sort === 'string' ? paramsObj.sort : undefined,
     q: typeof paramsObj.q === 'string' ? paramsObj.q : undefined,
     category: typeof paramsObj.category === 'string' ? paramsObj.category : undefined
-  };
+};
 }
 
 export default async function SearchPage({ searchParams }: { 

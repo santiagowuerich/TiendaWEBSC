@@ -86,12 +86,13 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
 
         <div className="relative h-full w-full">
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#eceff0] dark:bg-neutral-900 animate-pulse">
+            <div className="absolute inset-0 flex items-center justify-center bg-[#eceff0] dark:bg-neutral-900 animate-pulse rounded-xl">
               <span className="sr-only">Cargando imagen</span>
             </div>
           )}
+          <div className="absolute inset-0 rounded-xl border border-neutral-00 dark:border-neutral-00" />
           <Image
-            className="h-full w-full object-contain"
+            className={`h-full w-full object-contain transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             src={validImages[imageIndex]?.src || ''}
@@ -101,7 +102,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcsGJhPQAGAwHAoFyw7AAAAABJRU5ErkJggg=="
             onLoad={() => setIsLoading(false)}
           />
-        </div>
+          </div>
       </div>
 
       {validImages.length > 1 ? (
