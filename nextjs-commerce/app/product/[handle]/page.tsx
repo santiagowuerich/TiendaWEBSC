@@ -2,21 +2,35 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { GridTileImage } from 'components/grid/tile';
-import Footer from 'components/layout/footer';
-import { Gallery } from 'components/product/gallery';
-import { ProductProvider } from 'components/product/product-context';
-import { ProductDescription } from 'components/product/product-description';
-import { HIDDEN_PRODUCT_TAG } from 'lib/constants';
-import { getProductBySlug, getAllProducts, formatSanityProduct, FormattedProduct, SanityProduct } from 'lib/sanity';
+import { GridTileImage } from '../../../components/grid/tile';
+import Footer from '../../../components/layout/footer';
+import { Gallery } from '../../../components/product/gallery';
+import { ProductProvider } from '../../../components/product/product-context';
+import { ProductDescription } from '../../../components/product/product-description';
+import { HIDDEN_PRODUCT_TAG } from '../../../lib/constants';
+import { 
+  getProductBySlug, 
+  getAllProducts, 
+  formatSanityProduct, 
+  FormattedProduct, 
+  SanityProduct 
+} from '../../../lib/sanity';
 import Link from 'next/link';
 
 export const revalidate = 3600; // Revalidar cada hora
 
-// Definir tipo para los parámetros
-type PageProps = {
-  params: { handle: string };
-};
+interface PageProps {
+  params: {
+    handle: string;
+  };
+}
+
+export async function generateStaticParams() {
+  const products = await getAllProducts();
+  return products.map((product: SanityProduct) => ({
+    handle: product.slug
+  }));
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { handle } = params;
@@ -26,9 +40,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   
   const product = formatSanityProduct(sanityProduct);
   const { url } = product.featuredImage || {};
-  const width = 900;
-  const height = 900;
-  const alt = product.title;
 
   return {
     title: product.title,
@@ -38,9 +49,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           images: [
             {
               url,
-              width,
-              height,
-              alt
+              width: 900,
+              height: 900,
+              alt: product.title
             }
           ]
         }
@@ -98,7 +109,6 @@ export default async function ProductPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Productos relacionados */}
         <Suspense fallback={<div className="mt-16 text-center">Cargando productos relacionados...</div>}>
           <RelatedProducts currentProductId={product.id} />
         </Suspense>
