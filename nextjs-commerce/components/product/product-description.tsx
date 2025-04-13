@@ -11,9 +11,8 @@ function WhatsAppButton({ product }: { product: any }) {
     `¡Hola! Me interesa el producto "${product.title}" con precio ${product.priceRange.maxVariantPrice.amount} ${product.priceRange.maxVariantPrice.currencyCode}. ¿Está disponible?`
   );
   
-  // IMPORTANTE: Reemplaza este número con tu número real de WhatsApp
-  // Debe incluir el código de país (ej. 549 para Argentina)
-  const phoneNumber = '5491123456789'; // REEMPLAZAR CON TU NÚMERO REAL
+  // Número de WhatsApp con código de país para Argentina
+  const phoneNumber = '5493625281890'; // Número correcto +54 9 3625 281890
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
   
   return (

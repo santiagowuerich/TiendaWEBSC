@@ -13,11 +13,15 @@ import Link from 'next/link';
 
 // Definir tipo para los parámetros
 type PageProps = {
-  params: { handle: string };
+  params: Promise<{ handle: string }> | { handle: string };
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const sanityProduct = await getProductBySlug(params.handle);
+  // Esperar a que params se resuelva antes de usar sus propiedades
+  const paramsObj = await params;
+  const handle = paramsObj.handle;
+  
+  const sanityProduct = await getProductBySlug(handle);
 
   if (!sanityProduct) return notFound();
   
@@ -46,7 +50,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function ProductPage({ params }: PageProps) {
-  const sanityProduct = await getProductBySlug(params.handle);
+  // Esperar a que params se resuelva antes de usar sus propiedades
+  const paramsObj = await params;
+  const handle = paramsObj.handle;
+  
+  const sanityProduct = await getProductBySlug(handle);
 
   if (!sanityProduct) return notFound();
   

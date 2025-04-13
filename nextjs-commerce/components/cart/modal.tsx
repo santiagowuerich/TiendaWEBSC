@@ -7,8 +7,8 @@ import OpenCart from './open-cart';
 // Componente simplificado que reemplaza al carrito
 // En lugar de mostrar un modal con artículos, muestra un enlace a WhatsApp
 export default function CartModal() {
-  // Número de WhatsApp al que se enviará el mensaje (reemplazar con el número real)
-  const phoneNumber = '123456789'; // Reemplázalo con tu número real
+  // Número de WhatsApp al que se enviará el mensaje
+  const phoneNumber = '5493625281890'; // Número correcto +54 9 3625 281890
   
   // Mensaje genérico para WhatsApp
   const message = encodeURIComponent(

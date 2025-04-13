@@ -1,4 +1,3 @@
-import CartModal from 'components/cart/modal';
 import LogoSquare from 'components/logo-square';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -74,7 +73,7 @@ export async function Navbar() {
           </Suspense>
         </div>
         <div className="flex justify-end md:w-1/3">
-          <CartModal />
+          {/* El botón del carrito ha sido eliminado */}
         </div>
       </div>
     </nav>
