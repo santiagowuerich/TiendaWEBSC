@@ -8,7 +8,7 @@ interface BranchButtonProps {
 }
 
 export default function BranchButton({ 
-  href = '/sucursales',
+  href = '/Whatsapp',
   className = '',
   floating = false
 }: BranchButtonProps) {
@@ -24,7 +24,7 @@ export default function BranchButton({
         className="flex items-center justify-center gap-2 px-8 py-3 bg-green-500 text-white font-bold rounded-full transition-all duration-300 hover:bg-green-600 hover:shadow-lg"
       >
         <FaWhatsapp className="text-xl" />
-        <span>Sucursales</span>
+        <span>WhatsApp</span>
       </Link>
     </div>
   );
