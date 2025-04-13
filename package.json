@@ -1,0 +1,6 @@
+{
+	"dependencies": {
+		"@portabletext/types": "^2.0.13",
+		"next-intl": "^4.0.2"
+	}
+}

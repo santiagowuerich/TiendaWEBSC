@@ -1,0 +1,45 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "prettier": "prettier --write --ignore-unknown .",
+    "prettier:check": "prettier --check --ignore-unknown .",
+    "test": "pnpm prettier:check"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
+    "@portabletext/react": "^3.2.1",
+    "@sanity/client": "^6.29.0",
+    "@sanity/desk-tool": "^2.36.2",
+    "@sanity/icons": "^3.7.0",
+    "@sanity/image-url": "^1.1.0",
+    "@sanity/vision": "3",
+    "clsx": "^2.1.1",
+    "geist": "^1.3.1",
+    "next": "15.3.0-canary.13",
+    "next-intl": "^4.0.2",
+    "next-sanity": "9",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-icons": "^5.5.0",
+    "sanity": "^3.84.0",
+    "sonner": "^2.0.1",
+    "styled-components": "6"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/postcss": "^4.0.14",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.12",
+    "@types/react-dom": "19.0.4",
+    "postcss": "^8.5.3",
+    "prettier": "3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "tailwindcss": "^4.0.14",
+    "typescript": "5.8.2"
+  }
+}
