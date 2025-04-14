@@ -1,8 +1,20 @@
 'use client';
 
 import clsx from 'clsx';
-import { useProduct, useUpdateURL } from 'components/product/product-context';
-import { ProductOption, ProductVariant } from 'lib/shopify/types';
+import { useProduct, useUpdateURL } from './product-context';
+import { ProductOption, ProductVariant } from '../../lib/sanity/types';
+
+// Extendemos los tipos de Sanity para que incluyan las propiedades que necesitamos
+interface ExtendedProductOption extends ProductOption {
+  id?: string;
+  values: string[];
+}
+
+interface ExtendedProductVariant extends ProductVariant {
+  id: string;
+  availableForSale: boolean;
+  selectedOptions: { name: string; value: string }[];
+}
 
 type Combination = {
   id: string;
@@ -14,8 +26,8 @@ export function VariantSelector({
   options,
   variants
 }: {
-  options: ProductOption[];
-  variants: ProductVariant[];
+  options: ExtendedProductOption[];
+  variants: ExtendedProductVariant[];
 }) {
   const { state, updateOption } = useProduct();
   const updateURL = useUpdateURL();
@@ -30,7 +42,8 @@ export function VariantSelector({
     id: variant.id,
     availableForSale: variant.availableForSale,
     ...variant.selectedOptions.reduce(
-      (accumulator, option) => ({ ...accumulator, [option.name.toLowerCase()]: option.value }),
+      (accumulator: Record<string, string>, option: { name: string; value: string }) => 
+        ({ ...accumulator, [option.name.toLowerCase()]: option.value }),
       {}
     )
   }));
@@ -40,7 +53,7 @@ export function VariantSelector({
       <dl className="mb-8">
         <dt className="mb-4 text-sm uppercase tracking-wide">{option.name}</dt>
         <dd className="flex flex-wrap gap-3">
-          {option.values.map((value) => {
+          {option.values.map((value: string) => {
             const optionNameLowerCase = option.name.toLowerCase();
 
             // Base option params on current selectedOptions so we can preserve any other param state.
@@ -70,7 +83,7 @@ export function VariantSelector({
                 key={value}
                 aria-disabled={!isAvailableForSale}
                 disabled={!isAvailableForSale}
-                title={`${option.name} ${value}${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
+                title={`${option.name} ${value}${!isAvailableForSale ? ' (Agotado)' : ''}`}
                 className={clsx(
                   'flex min-w-[48px] items-center justify-center rounded-full border bg-neutral-100 px-2 py-1 text-sm dark:border-neutral-800 dark:bg-neutral-900',
                   {
