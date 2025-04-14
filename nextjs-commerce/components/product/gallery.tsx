@@ -32,6 +32,11 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
   const buttonClassName =
     'h-full px-6 transition-all ease-in-out hover:scale-110 hover:text-black dark:hover:text-white flex items-center justify-center';
 
+  // Verificar si la imagen actual es de Sanity
+  const isSanityImage = validImages[imageIndex]?.src && 
+    typeof validImages[imageIndex].src === 'string' && 
+    validImages[imageIndex].src.includes('cdn.sanity.io') ? true : false;
+
   // Precarga de imágenes para navegación más fluida
   useEffect(() => {
     // Precarga la imagen anterior y siguiente
@@ -90,7 +95,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
               <span className="sr-only">Cargando imagen</span>
             </div>
           )}
-          <div className="absolute inset-0 rounded-xl border border-neutral-00 dark:border-neutral-00" />
+          <div className="absolute inset-0 rounded-xl border border-neutral-200 dark:border-neutral-800" />
           <Image
             className={`h-full w-full object-contain transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
             fill
@@ -101,14 +106,19 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
             placeholder="blur"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcsGJhPQAGAwHAoFyw7AAAAABJRU5ErkJggg=="
             onLoad={() => setIsLoading(false)}
+            unoptimized={isSanityImage}
           />
-          </div>
+        </div>
       </div>
 
       {validImages.length > 1 ? (
         <ul className="flex items-center justify-center gap-2 overflow-auto py-1">
           {validImages.map((image, index) => {
             const isActive = index === imageIndex;
+            const isThumbnailSanityImage = image.src && 
+              typeof image.src === 'string' && 
+              image.src.includes('cdn.sanity.io') ? true : false;
+              
             return (
               <li key={image.src} className="h-20 w-20">
                 <button
@@ -128,6 +138,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
                     isInteractive={!isActive}
                     active={isActive}
                     priority={index < 4} // Solo priorizar las primeras 4 miniaturas
+                    unoptimized={isThumbnailSanityImage}
                   />
                 </button>
               </li>

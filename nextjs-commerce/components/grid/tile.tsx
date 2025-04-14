@@ -28,38 +28,40 @@ export function GridTileImage({
   // Estado para controlar cuando la imagen ha cargado
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  // Verificar si la imagen es de Sanity para desactivar la optimización
+  const isSanityImage = typeof props.src === 'string' && props.src.includes('cdn.sanity.io');
+
   return (
     <div
       className={clsx(
         'group relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-white dark:bg-black',
         {
-          'ring-2 ring-neutral-00': active
+          'ring-2 ring-neutral-500': active,
+          'shadow-md': !active
         }
       )}
       style={{ contain: 'paint' }} // Optimiza la capa de pintura
     >
       {hasValidSrc ? (
-        <>
-          <div className="h-full w-full py-[100px]">
-            <Image
-              className={clsx('h-full w-full object-cover rounded-lg', {
-                'transition duration-300 ease-in-out group-hover:scale-105': isInteractive,
-                'opacity-100': imageLoaded,
-                'opacity-0': !imageLoaded
-              })}
-              {...props}
-              placeholder="blur"
-              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-              priority={props.priority}
-              alt={props.alt || "Imagen de producto"}
-              onLoad={() => setImageLoaded(true)}
-            />
-          </div>
-        </>
+        <div className="relative h-full w-full">
+          <Image
+            className={clsx('h-full w-full object-cover rounded-lg', {
+              'transition duration-300 ease-in-out group-hover:scale-105': isInteractive,
+              'opacity-100': imageLoaded,
+              'opacity-0': !imageLoaded
+            })}
+            {...props}
+            placeholder="blur"
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+            priority={props.priority}
+            alt={props.alt || "Imagen de producto"}
+            onLoad={() => setImageLoaded(true)}
+            unoptimized={isSanityImage} // No optimizar imágenes de Sanity
+          />
+        </div>
       ) : (
         <div className="flex h-full w-full items-center justify-center">
-          <span className="text-sm text-neutral-
-          00">Sin imagen</span>
+          <span className="text-sm text-neutral-500">Sin imagen</span>
         </div>
       )}
       {label ? (
