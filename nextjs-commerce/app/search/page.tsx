@@ -1,8 +1,8 @@
-import Grid from '../components/grid';
-import ProductGridItems from '../components/layout/product-grid-items';
-import { defaultSort, sorting, SortFilterItem } from '../lib/constants';
+import Grid from '../../components/grid';
+import ProductGridItems from '../../components/layout/product-grid-items';
+import { defaultSort, sorting, SortFilterItem } from '../../lib/constants';
 // import { getProducts } from 'lib/shopify'; // Ya no usamos Shopify
-import { getAllProducts, getProductsByCategory, formatSanityProduct, getAllCategories, SanityProduct, FormattedProduct } from '../lib/sanity';
+import { getAllProducts, getProductsByCategory, formatSanityProduct, getAllCategories, SanityProduct, FormattedProduct } from '../../lib/sanity';
 import { unstable_cache } from 'next/cache';
 
 export const revalidate = 3600; // Revalidar cada hora
@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = getSearchParams(paramsObj);
   
   const { sortKey, reverse } = 
-    sorting.find((item) => item.slug === params.sort) || defaultSort;
+    sorting.find((item: SortFilterItem) => item.slug === params.sort) || defaultSort;
 
   // Obtener todas las categorías
   const categories = await getAllCategories();
