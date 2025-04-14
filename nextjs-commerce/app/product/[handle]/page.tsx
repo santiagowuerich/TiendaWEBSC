@@ -16,7 +16,7 @@ import {
 } from '../../../lib/sanity';
 import Link from 'next/link';
 
-export const revalidate = 3600; // Revalidar cada hora
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const products = await getAllProducts();
@@ -25,14 +25,12 @@ export async function generateStaticParams() {
   }));
 }
 
-// generateMetadata recibe los params resueltos
-export async function generateMetadata(
-  props: {
-    params: { handle: string };
-  }
-): Promise<Metadata> {
-  const { handle } = props.params;
-  const sanityProduct = await getProductBySlug(handle);
+type Props = {
+  params: { handle: string }
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const sanityProduct = await getProductBySlug(params.handle);
   if (!sanityProduct) return notFound();
 
   const product = formatSanityProduct(sanityProduct);
@@ -56,15 +54,8 @@ export async function generateMetadata(
   };
 }
 
-// El componente de página también recibe los params resueltos
-export default async function ProductPage(
-  props: {
-    params: { handle: string };
-  }
-) {
-  const { handle } = props.params;
-
-  const sanityProduct = await getProductBySlug(handle);
+export default async function Page({ params }: Props) {
+  const sanityProduct = await getProductBySlug(params.handle);
   if (!sanityProduct) return notFound();
 
   const product = formatSanityProduct(sanityProduct);
