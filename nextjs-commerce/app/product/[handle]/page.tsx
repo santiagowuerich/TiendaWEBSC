@@ -19,7 +19,7 @@ import Link from 'next/link';
 
 export const revalidate = 3600; // Revalidar cada hora
 
-interface PageProps {
+interface ProductPageProps {
   params: {
     handle: string;
   };
@@ -32,7 +32,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { handle: string } }): Promise<Metadata> {
   const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
 
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function ProductPage({ params }: PageProps) {
+export default async function ProductPage({ params }: ProductPageProps) {
   const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
 
