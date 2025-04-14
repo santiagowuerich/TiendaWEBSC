@@ -19,25 +19,22 @@ import Link from 'next/link';
 
 export const revalidate = 3600; // Revalidar cada hora
 
-interface ProductPageProps {
-  params: {
-    handle: string;
-  };
-}
-
 export async function generateStaticParams() {
   const products = await getAllProducts();
   return products.map((product: SanityProduct) => ({
-    handle: product.slug
+    handle: product.slug,
   }));
 }
 
-export async function generateMetadata({ params }: { params: { handle: string } }): Promise<Metadata> {
+// Usamos un tipo inline en generateMetadata para evitar conflictos con los tipos internos de Next.js.
+export async function generateMetadata({
+  params,
+}: { params: { handle: string } }): Promise<Metadata> {
   const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
 
   if (!sanityProduct) return notFound();
-  
+
   const product = formatSanityProduct(sanityProduct);
   const { url } = product.featuredImage || {};
 
@@ -51,11 +48,17 @@ export async function generateMetadata({ params }: { params: { handle: string } 
               url,
               width: 900,
               height: 900,
-              alt: product.title
-            }
-          ]
+              alt: product.title,
+            },
+          ],
         }
-      : null
+      : null,
+  };
+}
+
+interface ProductPageProps {
+  params: {
+    handle: string;
   };
 }
 
@@ -64,7 +67,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const sanityProduct = await getProductBySlug(handle);
 
   if (!sanityProduct) return notFound();
-  
+
   const product = formatSanityProduct(sanityProduct);
 
   const productJsonLd = {
@@ -77,8 +80,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
       '@type': 'Offer',
       price: product.priceRange.maxVariantPrice.amount,
       priceCurrency: product.priceRange.maxVariantPrice.currencyCode,
-      availability: 'https://schema.org/InStock'
-    }
+      availability: 'https://schema.org/InStock',
+    },
   };
 
   return (
@@ -86,7 +89,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productJsonLd)
+          __html: JSON.stringify(productJsonLd),
         }}
       />
       <div className="max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16">
@@ -94,10 +97,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="w-full md:w-1/2">
             <Suspense fallback={<div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />}>
               <Gallery
-                images={[{
-                  src: product.featuredImage.url || '',
-                  altText: product.title
-                }]}
+                images={[
+                  {
+                    src: product.featuredImage.url || '',
+                    altText: product.title,
+                  },
+                ]}
               />
             </Suspense>
           </div>
@@ -121,12 +126,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
 async function RelatedProducts({ currentProductId }: { currentProductId: string }) {
   try {
     const allProducts = await getAllProducts();
-    
+
     if (!allProducts || !allProducts.length) {
       console.error('No hay productos disponibles');
       return null;
     }
-    
+
     // Filtrar productos y asegurarse de que tienen todas las propiedades necesarias
     const relatedProducts = allProducts
       .filter((product: SanityProduct) => product._id !== currentProductId)
@@ -162,7 +167,7 @@ async function RelatedProducts({ currentProductId }: { currentProductId: string 
                   label={{
                     title: product.title,
                     amount: product.priceRange.maxVariantPrice.amount,
-                    currencyCode: product.priceRange.maxVariantPrice.currencyCode
+                    currencyCode: product.priceRange.maxVariantPrice.currencyCode,
                   }}
                   src={product.featuredImage.url || ''}
                   fill
