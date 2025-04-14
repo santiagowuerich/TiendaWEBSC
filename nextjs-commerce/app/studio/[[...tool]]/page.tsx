@@ -15,16 +15,28 @@ import { useEffect, useState } from 'react';
 
 export const dynamic = 'force-dynamic';
 
-export { metadata, viewport } from 'next-sanity/studio';
-
 export default function StudioPage() {
   const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Verificar configuración
+    try {
+      console.log("Configuración de Studio:", {
+        projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+        dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+        hasToken: process.env.SANITY_API_TOKEN ? true : false
+      });
+    } catch (err: any) {
+      setError(err.message);
+    }
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted) return <div className="p-8">Cargando Studio...</div>;
+  
+  if (error) return <div className="p-8">Error al cargar Studio: {error}</div>;
 
   return <NextStudio config={config} />;
 }

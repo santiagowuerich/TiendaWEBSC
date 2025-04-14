@@ -13,5 +13,13 @@ module.exports = {
         hostname: 'cdn.sanity.io'
       }
     ]
-  }
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/studio/:path*',
+        destination: '/studio/:path*',
+      },
+    ];
+  },
 };
