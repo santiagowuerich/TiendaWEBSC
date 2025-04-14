@@ -12,8 +12,27 @@
 import { NextStudio } from 'next-sanity/studio';
 import config from '../../../sanity.config';
 import { useEffect, useState } from 'react';
+import StudioErrorBoundary from '../studio-error-boundary';
 
 export const dynamic = 'force-dynamic';
+
+// Precargar el dominio de CDN de Sanity para evitar errores
+const preloadSanityImages = () => {
+  if (typeof window !== 'undefined') {
+    // Crear una imagen oculta para precargar el dominio
+    const img = new Image();
+    img.src = 'https://cdn.sanity.io/images/placeholder.jpg';
+    img.style.display = 'none';
+    document.body.appendChild(img);
+    
+    // Quitarla después de 3 segundos
+    setTimeout(() => {
+      if (img.parentNode) {
+        document.body.removeChild(img);
+      }
+    }, 3000);
+  }
+};
 
 export default function StudioPage() {
   const [mounted, setMounted] = useState(false);
@@ -21,6 +40,9 @@ export default function StudioPage() {
 
   useEffect(() => {
     setMounted(true);
+    
+    // Precargar dominio de imágenes
+    preloadSanityImages();
     
     // Verificar configuración
     try {
@@ -38,5 +60,14 @@ export default function StudioPage() {
   
   if (error) return <div className="p-8">Error al cargar Studio: {error}</div>;
 
-  return <NextStudio config={config} />;
+  return (
+    <StudioErrorBoundary>
+      <div className="sanity-studio-container" style={{ height: '100%' }}>
+        <NextStudio 
+          config={config} 
+          unstable_noAuthBoundary
+        />
+      </div>
+    </StudioErrorBoundary>
+  );
 }

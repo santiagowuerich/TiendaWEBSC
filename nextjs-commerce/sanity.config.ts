@@ -33,5 +33,7 @@ export default defineConfig({
   auth: {
     redirectOnSingle: false,
     loginMethod: 'token'
-  }
+  },
+  // Asegurarnos de que se use el token de API correcto
+  useCdn: false, // Para asegurar que se obtengan siempre datos frescos
 })
