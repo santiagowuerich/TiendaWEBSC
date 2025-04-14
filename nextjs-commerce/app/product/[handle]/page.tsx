@@ -7,7 +7,6 @@ import Footer from '../../../components/layout/footer';
 import { Gallery } from '../../../components/product/gallery';
 import { ProductProvider } from '../../../components/product/product-context';
 import { ProductDescription } from '../../../components/product/product-description';
-import { HIDDEN_PRODUCT_TAG } from '../../../lib/constants';
 import {
   getProductBySlug,
   getAllProducts,
@@ -26,6 +25,8 @@ export async function generateStaticParams() {
   }));
 }
 
+// Declaramos generateMetadata sin envolver params en Promise,
+// puesto que en este caso Next.js ya lo pasa resuelto.
 export async function generateMetadata({
   params,
 }: {
@@ -33,7 +34,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
-
   if (!sanityProduct) return notFound();
 
   const product = formatSanityProduct(sanityProduct);
@@ -58,15 +58,16 @@ export async function generateMetadata({
 }
 
 export default async function ProductPage({
-  params
+  params,
 }: {
   params: { handle: string };
 }) {
-  const { handle } = params;
-  const sanityProduct = await getProductBySlug(handle);
+  // Para "simular" que params es asíncrono y cumplir con la firma interna, lo envolvemos
+  const { handle } = await Promise.resolve(params);
 
+  const sanityProduct = await getProductBySlug(handle);
   if (!sanityProduct) return notFound();
-  
+
   const product = formatSanityProduct(sanityProduct);
 
   const productJsonLd = {
@@ -87,9 +88,7 @@ export default async function ProductPage({
     <ProductProvider>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(productJsonLd),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
       <div className="max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16">
         <div className="flex flex-col rounded-2xl bg-[#eceff0] dark:bg-black shadow-lg overflow-hidden md:flex-row">
@@ -145,20 +144,18 @@ async function RelatedProducts({
       return null;
     }
 
-    // Filtrar productos y asegurarse de que tienen todas las propiedades necesarias
     const relatedProducts = allProducts
       .filter((product: SanityProduct) => product._id !== currentProductId)
       .slice(0, 4)
       .map((product: any) => {
         try {
-          const formatted = formatSanityProduct(product);
-          return formatted;
+          return formatSanityProduct(product);
         } catch (err) {
           console.error('Error al formatear producto:', err);
           return null;
         }
       })
-      .filter(Boolean); // Eliminar nulls
+      .filter(Boolean);
 
     if (!relatedProducts.length) return null;
 
