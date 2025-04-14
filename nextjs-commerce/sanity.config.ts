@@ -29,5 +29,9 @@ export default defineConfig({
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),
   ],
-  // Eliminar la configuración de autenticación para usar la predeterminada
+  // Agregar configuración de autenticación
+  auth: {
+    redirectOnSingle: false,
+    loginMethod: 'token'
+  }
 })

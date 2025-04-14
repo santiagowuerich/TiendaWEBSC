@@ -7,13 +7,24 @@
  * https://github.com/sanity-io/next-sanity
  */
 
-import { NextStudio } from 'next-sanity/studio'
-import config from '../../../sanity.config'
+'use client';
 
-export const dynamic = 'force-dynamic'
+import { NextStudio } from 'next-sanity/studio';
+import config from '../../../sanity.config';
+import { useEffect, useState } from 'react';
 
-export { metadata, viewport } from 'next-sanity/studio'
+export const dynamic = 'force-dynamic';
+
+export { metadata, viewport } from 'next-sanity/studio';
 
 export default function StudioPage() {
-  return <NextStudio config={config} />
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return <NextStudio config={config} />;
 }
