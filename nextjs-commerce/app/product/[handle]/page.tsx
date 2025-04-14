@@ -25,12 +25,14 @@ export async function generateStaticParams() {
   }));
 }
 
-type Props = {
-  params: { handle: string }
-};
+interface PageProps {
+  params: Promise<{ handle: string }>;
+}
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const sanityProduct = await getProductBySlug(params.handle);
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { handle } = await params;
+  
+  const sanityProduct = await getProductBySlug(handle);
   if (!sanityProduct) return notFound();
 
   const product = formatSanityProduct(sanityProduct);
@@ -54,8 +56,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Page({ params }: Props) {
-  const sanityProduct = await getProductBySlug(params.handle);
+export default async function Page({ params }: PageProps) {
+  const { handle } = await params;
+  
+  const sanityProduct = await getProductBySlug(handle);
   if (!sanityProduct) return notFound();
 
   const product = formatSanityProduct(sanityProduct);
