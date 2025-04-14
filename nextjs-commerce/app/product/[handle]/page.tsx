@@ -26,7 +26,6 @@ export async function generateStaticParams() {
   }));
 }
 
-// Usamos tipo inline en generateMetadata para evitar conflictos
 export async function generateMetadata({
   params,
 }: {
@@ -58,21 +57,16 @@ export async function generateMetadata({
   };
 }
 
-// Definimos nuestra interfaz para la página
-interface ProductPageProps {
+export default async function ProductPage({
+  params
+}: {
   params: { handle: string };
-}
-
-// Para “satisfacer” la restricción interna de Next.js, hacemos una aserción de tipo,
-// tratando los params como si fueran una Promise (incluso sabiendo que en tiempo de ejecución son objeto).
-export default async function ProductPage(_props: ProductPageProps) {
-  // Convertimos los params en una promise resuelta para que el tipo cuente con métodos then/catch/finally
-  const props = _props as unknown as { params: Promise<{ handle: string }> };
-  const { handle } = await props.params;
-
+}) {
+  const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
-  if (!sanityProduct) return notFound();
 
+  if (!sanityProduct) return notFound();
+  
   const product = formatSanityProduct(sanityProduct);
 
   const productJsonLd = {
