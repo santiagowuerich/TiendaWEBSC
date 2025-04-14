@@ -13,6 +13,11 @@ export function middleware(request: NextRequest) {
     const isLocalhost = request.headers.get('host')?.includes('localhost')
     const isCorrectKey = adminKey === process.env.ADMIN_ACCESS_KEY
     
+    // Permitir acceso al Studio para depuración
+    if (request.nextUrl.pathname === '/studio-debug') {
+      return NextResponse.next()
+    }
+    
     // Si no es localhost y la clave no es correcta
     if (!isLocalhost && !isCorrectKey) {
       // Redirigir a la página principal
@@ -26,5 +31,5 @@ export function middleware(request: NextRequest) {
 
 // Especificar las rutas a las que se aplicará este middleware
 export const config = {
-  matcher: ['/studio/:path*'],
+  matcher: ['/studio/:path*', '/studio-debug'],
 } 

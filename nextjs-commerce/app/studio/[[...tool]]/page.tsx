@@ -17,37 +17,12 @@ export const dynamic = 'force-dynamic';
 
 export default function StudioPage() {
   const [mounted, setMounted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
-    
-    // Debug de configuración
-    console.log("Config:", {
-      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-      hasToken: process.env.SANITY_API_TOKEN ? "Sí" : "No"
-    });
-    
-    try {
-      // Intentar cargar algo de Sanity para ver si hay errores
-      fetch(`https://${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}.api.sanity.io/v1/data/query/production?query=*[_type=="product"][0]`)
-        .catch(err => setError(err.message));
-    } catch (err: any) {
-      setError(err.message);
-    }
   }, []);
 
   if (!mounted) return <div>Cargando Studio...</div>;
-  
-  if (error) return <div>Error al conectar con Sanity: {error}</div>;
 
-  return (
-    <>
-      <div style={{padding: "10px", background: "#f0f0f0", margin: "10px"}}>
-        Studio cargado correctamente. Si ves esto, la página funciona.
-      </div>
-      <NextStudio config={config} unstable_noAuthBoundary />
-    </>
-  );
+  return <NextStudio config={config} unstable_noAuthBoundary />;
 }
