@@ -1,8 +1,8 @@
-import Grid from 'components/grid';
-import ProductGridItems from 'components/layout/product-grid-items';
-import { defaultSort, sorting, SortFilterItem } from 'lib/constants';
+import Grid from '../components/grid';
+import ProductGridItems from '../components/layout/product-grid-items';
+import { defaultSort, sorting, SortFilterItem } from '../lib/constants';
 // import { getProducts } from 'lib/shopify'; // Ya no usamos Shopify
-import { getAllProducts, getProductsByCategory, formatSanityProduct, getAllCategories, SanityProduct, FormattedProduct } from 'lib/sanity';
+import { getAllProducts, getProductsByCategory, formatSanityProduct, getAllCategories, SanityProduct, FormattedProduct } from '../lib/sanity';
 import { unstable_cache } from 'next/cache';
 
 export const revalidate = 3600; // Revalidar cada hora
@@ -12,22 +12,24 @@ export const metadata = {
   description: 'Busca productos en la tienda'
 };
 
-// Helper para procesar los parámetros de búsqueda (recibe un objeto normal, no una promesa)
+// Helper para procesar los parámetros de búsqueda
 function getSearchParams(paramsObj: Record<string, string | string[] | undefined> = {}) {
   return {
     sort: typeof paramsObj.sort === 'string' ? paramsObj.sort : undefined,
     q: typeof paramsObj.q === 'string' ? paramsObj.q : undefined,
     category: typeof paramsObj.category === 'string' ? paramsObj.category : undefined
-};
+  };
 }
 
-export default async function SearchPage({ searchParams }: { 
-  searchParams: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>
-}) {
-  // Esperamos a que searchParams se resuelva antes de usar sus propiedades
+interface SearchPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function SearchPage({ searchParams }: SearchPageProps) {
+  // Esperamos a que searchParams se resuelva
   const paramsObj = await searchParams;
   
-  // Ahora procesamos el objeto normal (no la promesa)
+  // Ahora procesamos el objeto ya resuelto
   const params = getSearchParams(paramsObj);
   
   const { sortKey, reverse } = 
