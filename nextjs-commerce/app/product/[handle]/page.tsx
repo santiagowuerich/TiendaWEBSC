@@ -79,49 +79,51 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <ProductProvider>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
-      />
-      <div className="max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16">
-        <div className="flex flex-col rounded-2xl bg-[#eceff0] dark:bg-black shadow-lg overflow-hidden md:flex-row">
-          <div className="w-full md:w-1/2">
-            <Suspense
-              fallback={
-                <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />
-              }
-            >
-              <Gallery
-                images={[
-                  {
-                    src: product.featuredImage.url || '',
-                    altText: product.title,
-                  },
-                ]}
-              />
-            </Suspense>
-          </div>
-
-          <div className="w-full p-6 md:p-10 md:w-1/2">
-            <Suspense fallback={null}>
-              <ProductDescription product={product} />
-            </Suspense>
-          </div>
-        </div>
-
-        <Suspense
-          fallback={
-            <div className="mt-16 text-center">
-              Cargando productos relacionados...
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16 text-center">Cargando detalles del producto...</div>}>
+      <ProductProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        />
+        <div className="max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16">
+          <div className="flex flex-col rounded-2xl bg-[#eceff0] dark:bg-black shadow-lg overflow-hidden md:flex-row">
+            <div className="w-full md:w-1/2">
+              <Suspense
+                fallback={
+                  <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden" />
+                }
+              >
+                <Gallery
+                  images={[
+                    {
+                      src: product.featuredImage.url || '',
+                      altText: product.title,
+                    },
+                  ]}
+                />
+              </Suspense>
             </div>
-          }
-        >
-          <RelatedProducts currentProductId={product.id} />
-        </Suspense>
-      </div>
-      <Footer />
-    </ProductProvider>
+
+            <div className="w-full p-6 md:p-10 md:w-1/2">
+              <Suspense fallback={null}>
+                <ProductDescription product={product} />
+              </Suspense>
+            </div>
+          </div>
+
+          <Suspense
+            fallback={
+              <div className="mt-16 text-center">
+                Cargando productos relacionados...
+              </div>
+            }
+          >
+            <RelatedProducts currentProductId={product.id} />
+          </Suspense>
+        </div>
+        <Footer />
+      </ProductProvider>
+    </Suspense>
   );
 }
 
