@@ -15,8 +15,6 @@ import { useEffect, useState } from 'react';
 
 export const dynamic = 'force-dynamic';
 
-export { metadata, viewport } from 'next-sanity/studio';
-
 export default function StudioPage() {
   const [mounted, setMounted] = useState(false);
 
@@ -26,5 +24,5 @@ export default function StudioPage() {
 
   if (!mounted) return null;
 
-  return <NextStudio config={config} />;
+  return <NextStudio config={config} unstable_noAuthBoundary />;
 }
