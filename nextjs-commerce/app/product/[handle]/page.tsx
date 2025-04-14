@@ -27,11 +27,12 @@ export async function generateStaticParams() {
 
 // Declaramos generateMetadata sin envolver params en Promise,
 // puesto que en este caso Next.js ya lo pasa resuelto.
-export async function generateMetadata({
-  params,
-}: {
-  params: { handle: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ handle: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const { handle } = params;
   const sanityProduct = await getProductBySlug(handle);
   if (!sanityProduct) return notFound();
@@ -57,11 +58,12 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductPage({
-  params,
-}: {
-  params: { handle: string };
-}) {
+export default async function ProductPage(
+  props: {
+    params: Promise<{ handle: string }>;
+  }
+) {
+  const params = await props.params;
   // Para "simular" que params es asíncrono y cumplir con la firma interna, lo envolvemos
   const { handle } = await Promise.resolve(params);
 
