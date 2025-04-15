@@ -16,9 +16,10 @@ import { NextStudio } from 'next-sanity/studio';
 import { StudioProvider, StudioLayout } from 'sanity';
 import config from '../../../sanity.config';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
-export default function StudioPage() {
+// Componente interno que usa useSearchParams
+function StudioPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -113,5 +114,21 @@ export default function StudioPage() {
         </StudioProvider>
       </NextStudio>
     </div>
+  );
+}
+
+// Componente principal envuelto en Suspense
+export default function StudioPage() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full mb-4 mx-auto"></div>
+          <p>Cargando Studio...</p>
+        </div>
+      </div>
+    }>
+      <StudioPageContent />
+    </Suspense>
   );
 }
