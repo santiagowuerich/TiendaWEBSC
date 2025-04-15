@@ -40,17 +40,20 @@ export async function Navbar() {
           <MobileMenu menu={menu} />
         </Suspense>
       </div>
+      
       <div className="flex w-full items-center">
+        {/* Logo y navegación - lado izquierdo */}
         <div className="flex w-full md:w-1/3">
           <Link
             href="/"
             prefetch={true}
-            className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6"
+            className="mr-4 flex items-center"
           >
             <LogoWithText />
           </Link>
+          
           {menu.length ? (
-            <ul className="hidden gap-6 text-base md:flex md:items-center">
+            <ul className="hidden gap-8 text-base md:flex md:items-center">
               {menu.map((item: MenuItem) => (
                 <li key={item.title}>
                   <Link
@@ -65,11 +68,15 @@ export async function Navbar() {
             </ul>
           ) : null}
         </div>
-        <div className="hidden justify-center md:flex md:w-1/3">
+        
+        {/* Búsqueda - centro */}
+        <div className="hidden justify-center px-4 md:flex md:w-1/3">
           <Suspense fallback={<SearchSkeleton />}>
             <Search />
           </Suspense>
         </div>
+        
+        {/* Espacio para elementos a la derecha */}
         <div className="flex justify-end md:w-1/3">
           {/* Espacio para futuros elementos a la derecha, si es necesario */}
         </div>
