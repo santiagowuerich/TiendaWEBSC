@@ -18,16 +18,46 @@ export const dynamic = 'force-dynamic';
 export default function StudioPage() {
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasToken, setHasToken] = useState<boolean>(false);
 
   useEffect(() => {
     setMounted(true);
     
+    // Intentar acceder directamente al token desde window si está disponible
+    const checkToken = () => {
+      try {
+        // En el cliente, intentamos acceder a la variable global si existe
+        if (typeof window !== 'undefined' && 
+            window && 
+            // @ts-ignore - Accedemos a una propiedad dinámica
+            window.__env && 
+            // @ts-ignore
+            window.__env.SANITY_API_TOKEN) {
+          setHasToken(true);
+          return true;
+        }
+        
+        // Verificar si el token está en las variables de entorno
+        const token = process.env.SANITY_API_TOKEN;
+        if (token) {
+          setHasToken(true);
+          return true;
+        }
+        
+        return false;
+      } catch (e) {
+        console.warn("Error al verificar token:", e);
+        return false;
+      }
+    };
+    
     // Verificar configuración
     try {
+      const tokenAvailable = checkToken();
       console.log("Configuración de Studio:", {
         projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
         dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-        hasToken: process.env.SANITY_API_TOKEN ? true : false
+        hasToken: tokenAvailable
       });
     } catch (err: any) {
       setError(err.message);
@@ -38,6 +68,17 @@ export default function StudioPage() {
   
   if (error) return <div className="p-8">Error al cargar Studio: {error}</div>;
 
-  // Usar unstable_noAuthBoundary para evitar problemas con la autenticación
-  return <NextStudio config={config} unstable_noAuthBoundary />;
+  return (
+    <div>
+      {/* Mostrar información de configuración */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="p-2 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+          Token de API: {hasToken ? '✅ Configurado' : '❌ No configurado'}
+        </div>
+      )}
+      
+      {/* Componente principal del Studio */}
+      <NextStudio config={config} unstable_noAuthBoundary />
+    </div>
+  );
 }

@@ -14,6 +14,10 @@ import {apiVersion, dataset, projectId} from './sanity/env'
 import {schema} from './sanity/schemaTypes'
 import {structure} from './sanity/structure'
 
+// Obtener el token de API para Sanity
+const token = typeof process !== 'undefined' && process.env && process.env.SANITY_API_TOKEN ?
+  process.env.SANITY_API_TOKEN : undefined
+
 export default defineConfig({
   basePath: '/studio',
   projectId,
@@ -29,6 +33,8 @@ export default defineConfig({
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),
   ],
-  // Configuración simplificada sin autenticación personalizada
-  useCdn: false
+  // Configuración simplificada 
+  useCdn: false,
+  // Agregar el token para la autenticación
+  token
 })
