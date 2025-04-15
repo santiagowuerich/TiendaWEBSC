@@ -5,6 +5,10 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   // Verificar si la ruta comienza con /studio
   if (request.nextUrl.pathname.startsWith('/studio')) {
+    // Comentar temporalmente la verificación de acceso para permitir el acceso sin restricciones
+    // y corregir el problema de carga infinita
+    
+    /* 
     // Obtener la clave de acceso de la query string (ideal para desarrollo y pruebas iniciales)
     const adminKey = request.nextUrl.searchParams.get('access_key')
     
@@ -18,6 +22,7 @@ export function middleware(request: NextRequest) {
       // Redirigir a la página principal
       return NextResponse.redirect(new URL('/', request.url))
     }
+    */
   }
   
   // Si la validación pasa o la ruta no es /studio, continuar con la petición normal

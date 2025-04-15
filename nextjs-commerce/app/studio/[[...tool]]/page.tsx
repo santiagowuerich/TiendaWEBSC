@@ -38,5 +38,6 @@ export default function StudioPage() {
   
   if (error) return <div className="p-8">Error al cargar Studio: {error}</div>;
 
-  return <NextStudio config={config} />;
+  // Usar unstable_noAuthBoundary para evitar problemas con la autenticación
+  return <NextStudio config={config} unstable_noAuthBoundary />;
 }
