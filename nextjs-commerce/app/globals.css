@@ -9,9 +9,20 @@
   color-scheme: dark;
 }
 
-html, body {
+/* Aplicar fondo oscuro desde el principio para evitar flash de colores */
+html {
   background-color: #171717; /* neutral-900 en Tailwind */
   color-scheme: dark;
+}
+
+body {
+  background-color: #171717; /* neutral-900 en Tailwind */
+  color-scheme: dark;
+}
+
+/* Prevenir color verde al inicio */
+* {
+  transition: background-color 0s !important;
 }
 
 @layer base {

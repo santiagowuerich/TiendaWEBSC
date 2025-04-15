@@ -14,16 +14,16 @@ export default function BranchButton({
   className = '',
   floating = false
 }: BranchButtonProps) {
-  const baseClasses = "rounded-full p-1 bg-green-100";
+  const baseClasses = "rounded-full p-1 bg-neutral-800";
   const floatingClasses = floating 
-    ? "fixed bottom-6 right-6 shadow-xl z-50 hover:scale-105 transition-transform duration-300" 
+    ? "fixed bottom-6 right-6 shadow-xl z-50 hover:scale-105 duration-300"
     : "";
   
   return (
     <div className={`${baseClasses} ${floatingClasses} ${className}`}>
       <Link 
         href={href}
-        className="flex items-center justify-center gap-2 px-8 py-3 bg-green-500 text-white font-bold rounded-full transition-all duration-300 hover:bg-green-600 hover:shadow-lg"
+        className="flex items-center justify-center gap-2 px-8 py-3 bg-green-500 text-white font-bold rounded-full hover:bg-green-600 hover:shadow-lg"
       >
         <FaWhatsapp className="text-xl" />
         <span>WhatsApp</span>

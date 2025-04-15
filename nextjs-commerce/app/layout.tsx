@@ -46,7 +46,17 @@ export default async function RootLayout({
   children: ReactNode;
 }) {
   return (
-    <html lang="es" className={`${inter.variable} dark`}>
+    <html lang="es" className={`${inter.variable} dark`} style={{ backgroundColor: '#171717' }}>
+      <head>
+        <style dangerouslySetInnerHTML={{ __html: `
+          html, body {
+            background-color: #171717 !important;
+          }
+          * {
+            transition: background-color 0s !important;
+          }
+        `}} />
+      </head>
       <body className="bg-neutral-900 text-white selection:bg-pink-500 selection:text-white">
           <Navbar />
           <main>
