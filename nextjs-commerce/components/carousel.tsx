@@ -8,7 +8,7 @@ import { Suspense } from 'react';
 function ProductPlaceholder() {
   return (
     <li className="relative aspect-square h-[30vh] max-h-[275px] w-2/3 max-w-[275px] flex-none md:w-1/3 md:max-w-[275px] animate-pulse">
-      <div className="h-full w-full bg-[#eceff0] dark:bg-neutral-800 rounded-lg"></div>
+      <div className="h-full w-full bg-neutral-900 rounded-lg"></div>
     </li>
   );
 }
