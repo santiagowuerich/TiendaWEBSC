@@ -95,7 +95,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
               <span className="sr-only">Cargando imagen</span>
             </div>
           )}
-          <div className="absolute inset-0 rounded-xl border border-neutral-200 dark:border-neutral-800" />
+          <div className="absolute inset-0 rounded-xl border border-neutral-200 dark:border-neutral-00" />
           <Image
             className={`h-full w-full object-contain transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
             fill

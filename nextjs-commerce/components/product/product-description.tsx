@@ -31,7 +31,7 @@ function WhatsAppButton({ product }: { product: any }) {
 export function ProductDescription({ product }: { product: any }) {
   return (
     <>
-      <div className="mb-8 flex flex-col border-b border-neutral-300 pb-6 dark:border-neutral-700">
+      <div className="mb-8 flex flex-col border-b border-neutral-300 pb-6 dark:border-neutral-00">
         <h1 className="mb-5 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white md:text-5xl">{product.title}</h1>
         <div className="mb-4 flex items-center">
           <div className="rounded-xl bg-blue-600 px-6 py-3 text-xl font-bold text-white shadow-md">

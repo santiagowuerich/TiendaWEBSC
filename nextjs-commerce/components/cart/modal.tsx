@@ -25,7 +25,7 @@ export default function CartModal() {
       rel="noopener noreferrer"
       className="flex items-center justify-center"
     >
-      <button aria-label="Contactar por WhatsApp" className="relative flex items-center justify-center rounded-md border border-neutral-200 bg-white p-2 text-black hover:bg-green-100 dark:border-neutral-700 dark:bg-black dark:text-white dark:hover:bg-green-900">
+      <button aria-label="Contactar por WhatsApp" className="relative flex items-center justify-center rounded-md border border-neutral-200 bg-white p-2 text-black hover:bg-green-100 dark:border-neutral-00 dark:bg-black dark:text-white dark:hover:bg-green-900">
         <ShoppingCartIcon className="h-6 w-6 transition-all ease-in-out hover:scale-110 text-green-600" />
     </button>
     </Link>
