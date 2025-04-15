@@ -8,7 +8,7 @@ export default function Search() {
   const searchParams = useSearchParams();
 
   return (
-    <Form action="/search" className="w-full max-w-[300px]">
+    <Form action="/search" className="relative w-full w-80">
       <input
         key={searchParams?.get('q')}
         type="text"
@@ -16,7 +16,7 @@ export default function Search() {
         placeholder="Buscar productos..."
         autoComplete="off"
         defaultValue={searchParams?.get('q') || ''}
-        className="w-full rounded-lg border-0 bg-white px-4 py-2 text-base text-black placeholder:text-neutral-500 dark:border-0 dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400"
+        className="w-full h-9 rounded-lg border border-neutral-200 bg-white px-4 py-2 text-base text-black placeholder:text-neutral-500 dark:border-neutral-800 dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400"
       />
       <div className="absolute right-0 top-0 mr-3 flex h-full items-center">
         <MagnifyingGlassIcon className="h-4" />
@@ -27,10 +27,10 @@ export default function Search() {
 
 export function SearchSkeleton() {
   return (
-    <form className="w-full max-w-[300px]">
+    <form className="relative w-full w-80">
       <input
         placeholder="Buscar productos..."
-        className="w-full rounded-lg border-0 bg-white px-4 py-2 text-base text-black placeholder:text-neutral-500 dark:border-0 dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400"
+        className="w-full h-9 rounded-lg border border-neutral-200 bg-white px-4 py-2 text-base text-black placeholder:text-neutral-500 dark:border-neutral-800 dark:bg-transparent dark:text-white dark:placeholder:text-neutral-400"
       />
       <div className="absolute right-0 top-0 mr-3 flex h-full items-center">
         <MagnifyingGlassIcon className="h-4" />

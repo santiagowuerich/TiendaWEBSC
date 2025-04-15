@@ -10,7 +10,7 @@ export function LogoWithText() {
           className="h-full w-full object-contain"
         />
       </div>
-      <span className="text-white text-lg font-semibold">SC EQUIPAMIENTOS</span>
+      <span className="text-white text-lg font-semibold leading-none">SC EQUIPAMIENTOS</span>
     </div>
   );
 } 

@@ -53,13 +53,13 @@ export async function Navbar() {
           </Link>
           
           {menu.length ? (
-            <ul className="hidden gap-8 text-base md:flex md:items-center">
+            <ul className="hidden gap-4 text-base md:flex md:items-center">
               {menu.map((item: MenuItem) => (
                 <li key={item.title}>
                   <Link
                     href={item.path}
                     prefetch={true}
-                    className="text-neutral-500 underline-offset-4 hover:text-black hover:underline dark:text-neutral-400 dark:hover:text-neutral-300 tracking-wide"
+                    className="text-neutral-500 underline-offset-4 hover:text-black hover:underline dark:text-neutral-400 dark:hover:text-neutral-300"
                   >
                     {item.title}
                   </Link>
