@@ -13,6 +13,9 @@ import {apiVersion, dataset, projectId} from './sanity/env'
 import {schema} from './sanity/schemaTypes'
 import {structure} from './sanity/structure'
 
+// Obtener token del entorno
+const token = process.env.SANITY_API_TOKEN
+
 export default defineConfig({
   basePath: '/studio',
   projectId,
@@ -24,10 +27,8 @@ export default defineConfig({
     }),
     visionTool({defaultApiVersion: apiVersion}),
   ],
+  // Desactivar CDN para asegurar datos frescos
   useCdn: false,
-  // Obtener el token directamente de las variables de entorno disponibles en cliente
-  token: typeof window !== 'undefined' && 
-    // @ts-ignore - En versiones recientes de Next.js puede estar disponible
-    window.__env?.SANITY_API_TOKEN ||
-    process.env.SANITY_API_TOKEN
+  // Añadir el token para autenticación
+  token
 })
