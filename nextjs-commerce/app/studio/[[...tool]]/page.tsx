@@ -28,15 +28,15 @@ function StudioPageContent() {
   useEffect(() => {
     // Verificar la cookie existente
     const checkCookie = () => {
-      return document.cookie.includes('studio_auth=');
+      return document.cookie.split(';').some(item => item.trim().startsWith('studio_auth='));
     };
 
     // Establecer cookie de autenticación
-    const setAuthCookie = () => {
+    const setAuthCookie = (value: string) => {
       // Cookie válida por 7 días
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 7);
-      document.cookie = `studio_auth=true;expires=${expiryDate.toUTCString()};path=/`;
+      document.cookie = `studio_auth=${value};expires=${expiryDate.toUTCString()};path=/;SameSite=Lax`;
       return true;
     };
 
@@ -44,29 +44,40 @@ function StudioPageContent() {
     const checkAuth = () => {
       // Si ya está autenticado por cookie, continuar
       if (checkCookie()) {
+        console.log("Autenticado por cookie existente");
         setIsAuthorized(true);
         setIsLoading(false);
         return;
       }
 
       // En desarrollo permitimos acceso sin clave
-      if (process.env.NODE_ENV === 'development') {
-        setAuthCookie();
+      if (process.env.NODE_ENV === 'development' || 
+          window.location.hostname === 'localhost' || 
+          window.location.hostname === '127.0.0.1') {
+        console.log("Autorizando automáticamente en entorno de desarrollo");
+        setAuthCookie('development');
         setIsAuthorized(true);
         setIsLoading(false);
         return;
       }
 
-      // Verificar clave de acceso
+      // Verificar clave de acceso del query parameter
       const accessKey = searchParams.get('access_key');
       const adminKey = process.env.ADMIN_ACCESS_KEY || '456852';
       
+      console.log("Verificando acceso con clave:", !!accessKey);
+      
       if (accessKey && accessKey === adminKey) {
-        setAuthCookie();
+        console.log("Clave válida, autorizando...");
+        setAuthCookie(adminKey);
         setIsAuthorized(true);
-        // Redirigir sin parámetros
-        router.replace('/studio');
+        
+        // Redirigir sin parámetros para no exponer la clave en la URL
+        setTimeout(() => {
+          router.replace('/studio');
+        }, 100);
       } else {
+        console.log("No autorizado");
         setIsAuthorized(false);
       }
       
@@ -95,7 +106,7 @@ function StudioPageContent() {
         <div className="text-center max-w-md p-6 bg-red-50 dark:bg-red-900/20 rounded-lg">
           <h1 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Acceso restringido</h1>
           <p className="mb-4">No tienes permiso para acceder al Sanity Studio.</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Usa la URL con la clave correcta o contacta al administrador.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Usa la URL con la clave correcta o contacta al administrador.</p>
           <div className="mt-6">
             <a href="/studio-debug" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
               Ir a la página de diagnóstico

@@ -6,7 +6,6 @@
 
 import {visionTool} from '@sanity/vision'
 import {defineConfig} from 'sanity'
-// Importar deskTool directamente de sanity
 import {deskTool} from 'sanity/desk'
 
 // Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
@@ -14,31 +13,21 @@ import {apiVersion, dataset, projectId} from './sanity/env'
 import {schema} from './sanity/schemaTypes'
 import {structure} from './sanity/structure'
 
-// Obtener el token de API para Sanity
-const token = typeof process !== 'undefined' && process.env && process.env.SANITY_API_TOKEN ?
-  process.env.SANITY_API_TOKEN : undefined
-
 export default defineConfig({
   basePath: '/studio',
   projectId,
   dataset,
-  // Add and edit the content schema in the './sanity/schemaTypes' folder
   schema,
   plugins: [
-    // Desk tool es la herramienta principal para crear y editar contenido
     deskTool({
       structure
     }),
-    // Vision is for querying with GROQ from inside the Studio
-    // https://www.sanity.io/docs/the-vision-plugin
     visionTool({defaultApiVersion: apiVersion}),
   ],
-  // Configuración simplificada 
   useCdn: false,
-  // Agregar el token para la autenticación
-  token,
-  // Configuración para asegurar acceso administrativo
-  auth: {
-    loginMethod: 'token'
-  }
+  // Obtener el token directamente de las variables de entorno disponibles en cliente
+  token: typeof window !== 'undefined' && 
+    // @ts-ignore - En versiones recientes de Next.js puede estar disponible
+    window.__env?.SANITY_API_TOKEN ||
+    process.env.SANITY_API_TOKEN
 })
