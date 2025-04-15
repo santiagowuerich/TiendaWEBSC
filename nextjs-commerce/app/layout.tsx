@@ -28,6 +28,15 @@ export const metadata = {
   robots: {
     follow: true,
     index: true
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/icon.svg', type: 'image/svg+xml' }
+    ],
+    apple: [
+      { url: '/apple-icon.png' }
+    ]
   }
 };
 

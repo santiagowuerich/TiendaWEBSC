@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <rect width="500" height="500" fill="black"/>
+  <g fill="white">
+    <path d="M250 62L62 250L250 438L438 250L250 62ZM250 125L375 250L250 375L125 250L250 125Z" />
+    <path d="M250 188L313 250L250 313L188 250L250 188Z" />
+    <path d="M250 0L0 250L250 500L500 250L250 0ZM250 62L438 250L250 438L62 250L250 62Z" />
+  </g>
+</svg> 
