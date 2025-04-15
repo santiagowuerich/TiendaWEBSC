@@ -66,4 +66,6 @@ export interface Cart {
 export interface Menu {
   title: string;
   path: string;
-} 
+}
+
+export type Category = SanityCategory; 

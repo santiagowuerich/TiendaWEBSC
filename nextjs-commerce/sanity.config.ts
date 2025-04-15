@@ -36,5 +36,9 @@ export default defineConfig({
   // Configuración simplificada 
   useCdn: false,
   // Agregar el token para la autenticación
-  token
+  token,
+  // Configuración para asegurar acceso administrativo
+  auth: {
+    loginMethod: 'token'
+  }
 })

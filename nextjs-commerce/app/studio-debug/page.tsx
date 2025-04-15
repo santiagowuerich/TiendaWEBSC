@@ -2,112 +2,146 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { projectId, dataset, apiVersion } from '../../sanity/env';
 
 export default function StudioDebugPage() {
-  const [envVars, setEnvVars] = useState<Record<string, string>>({});
-  const [urlParams, setUrlParams] = useState<string>('');
-  const [domainInfo, setDomainInfo] = useState<string>('');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  
+  const [cookieAuth, setCookieAuth] = useState(false);
+  const [hostInfo, setHostInfo] = useState({
+    hostname: '',
+    origin: '',
+    url: '',
+  });
+  const [envVars, setEnvVars] = useState({
+    projectId,
+    dataset,
+    apiVersion,
+    adminAccessKey: process.env.ADMIN_ACCESS_KEY || '456852',
+  });
+
   useEffect(() => {
-    // Solo mostrar variables públicas, nunca el token
-    const adminKey = process.env.ADMIN_ACCESS_KEY || '456852';
+    // Verificar si existe la cookie de autenticación
+    setCookieAuth(document.cookie.includes('studio_auth='));
     
-    setEnvVars({
-      projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'no configurado',
-      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'no configurado',
-      apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || 'no configurado',
-      // Verificar si tenemos token (sin mostrarlo)
-      hasToken: process.env.SANITY_API_TOKEN ? 'configurado ✅' : 'no configurado ❌',
-      hasAdminKey: process.env.ADMIN_ACCESS_KEY ? 'configurado ✅' : 'no configurado ❌',
-      // No mostrar la clave completa en producción
-      adminKey: process.env.NODE_ENV === 'production' ? 
-        `${adminKey.substring(0, 2)}****${adminKey.substring(adminKey.length - 2)}` : 
-        adminKey,
+    // Obtener información sobre el dominio actual
+    setHostInfo({
+      hostname: window.location.hostname,
+      origin: window.location.origin,
+      url: window.location.href,
     });
-    
-    // Obtener parámetros de URL
-    setUrlParams(window.location.search);
-    setDomainInfo(window.location.origin);
-    
-    // Verificar si hay una cookie de autenticación
-    const hasAuthCookie = document.cookie.includes('studio_auth=');
-    setIsAuthenticated(hasAuthCookie);
   }, []);
 
+  // Generar URL de acceso con la clave
+  const accessUrl = `${hostInfo.origin}/studio?access_key=${envVars.adminAccessKey}`;
+
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Diagnóstico de Sanity Studio</h1>
-      <p className="mb-4">Esta página muestra la configuración y variables de entorno disponibles para Sanity Studio.</p>
+    <div className="min-h-screen p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Sanity Studio - Diagnóstico</h1>
       
       <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-        <h2 className="text-xl font-semibold mb-2">Estado de autenticación:</h2>
-        <div className="flex items-center space-x-2">
-          <span className={`inline-block w-3 h-3 rounded-full ${isAuthenticated ? 'bg-green-500' : 'bg-red-500'}`}></span>
-          <span>{isAuthenticated ? 'Autenticado en Studio' : 'No autenticado'}</span>
-        </div>
-        {!isAuthenticated && (
-          <Link 
-            href={`/studio?access_key=${envVars.adminKey}`}
-            className="mt-4 inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
-          >
-            Acceder al Studio
-          </Link>
-        )}
-        {isAuthenticated && (
-          <Link 
-            href="/studio"
-            className="mt-4 inline-block px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
-          >
-            Ir al Studio
-          </Link>
+        <h2 className="text-xl font-semibold mb-2">Estado de autenticación</h2>
+        {cookieAuth ? (
+          <div className="text-green-600 dark:text-green-400">
+            ✅ Tienes acceso autorizado al Studio
+          </div>
+        ) : (
+          <div className="text-red-600 dark:text-red-400">
+            ❌ No estás autorizado a acceder al Studio
+          </div>
         )}
       </div>
-      
-      <h2 className="text-xl font-bold mb-2">Dominio de la aplicación:</h2>
-      <pre className="bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-white mb-6">
-        {domainInfo}
-      </pre>
-      
-      <h2 className="text-xl font-bold mb-2">Variables de entorno:</h2>
-      <pre className="bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-white mb-6">
-        {JSON.stringify(envVars, null, 2)}
-      </pre>
-      
-      <h2 className="text-xl font-bold mb-2">Parámetros de URL:</h2>
-      <pre className="bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-white mb-6">
-        {urlParams || 'No hay parámetros'}
-      </pre>
-      
-      <div className="mt-8 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-        <h2 className="text-xl font-bold mb-4">¿Cómo acceder a Studio de forma segura?</h2>
-        <p className="mb-4">Para acceder al Studio en producción, usa cualquiera de estos métodos:</p>
-        
-        <div className="mb-4">
-          <h3 className="font-semibold mb-2">1. Acceso con URL + Clave</h3>
-          <pre className="bg-gray-100 p-4 rounded dark:bg-gray-800 dark:text-white mb-2">
-            {`${domainInfo}/studio?access_key=${envVars.adminKey}`}
-          </pre>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Este método establecerá una cookie que te mantendrá autenticado por 7 días.
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Acceder al Studio</h2>
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <p className="mb-4">Para acceder al Studio, usa la siguiente URL:</p>
+          <div className="bg-white dark:bg-gray-900 p-3 rounded border dark:border-gray-700 mb-4 overflow-x-auto">
+            <code>{accessUrl}</code>
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Esta URL contiene la clave de acceso necesaria. El acceso será válido por 7 días.
           </p>
         </div>
-        
-        <div className="mb-4">
-          <h3 className="font-semibold mb-2">2. Acceso desde localhost (solo en desarrollo)</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            En entorno de desarrollo, puedes acceder directamente desde localhost sin clave.
-          </p>
+      </div>
+      
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Información del dominio</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <tbody>
+              <tr className="border-b dark:border-gray-700">
+                <td className="py-2 px-4 font-medium">Hostname</td>
+                <td className="py-2 px-4">{hostInfo.hostname}</td>
+              </tr>
+              <tr className="border-b dark:border-gray-700">
+                <td className="py-2 px-4 font-medium">Origin</td>
+                <td className="py-2 px-4">{hostInfo.origin}</td>
+              </tr>
+              <tr>
+                <td className="py-2 px-4 font-medium">URL Actual</td>
+                <td className="py-2 px-4 text-xs sm:text-sm break-all">{hostInfo.url}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        
-        <h2 className="text-xl font-bold my-4">Pasos para resolver problemas:</h2>
-        <ol className="list-decimal pl-5 space-y-2 text-gray-700 dark:text-gray-300">
-          <li>Verificar que las variables de entorno estén configuradas en Vercel</li>
-          <li>Agregar el dominio de la aplicación en CORS origins de Sanity</li>
-          <li>Marcar "Allow credentials" en la configuración de CORS</li>
-          <li>Limpiar cookies si tienes problemas de autenticación</li>
-          <li>Verificar que el token de API de Sanity sea válido</li>
-        </ol>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Variables de entorno</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <tbody>
+              <tr className="border-b dark:border-gray-700">
+                <td className="py-2 px-4 font-medium">Project ID</td>
+                <td className="py-2 px-4">{envVars.projectId || <span className="text-red-500">No configurado</span>}</td>
+              </tr>
+              <tr className="border-b dark:border-gray-700">
+                <td className="py-2 px-4 font-medium">Dataset</td>
+                <td className="py-2 px-4">{envVars.dataset || <span className="text-red-500">No configurado</span>}</td>
+              </tr>
+              <tr className="border-b dark:border-gray-700">
+                <td className="py-2 px-4 font-medium">API Version</td>
+                <td className="py-2 px-4">{envVars.apiVersion || <span className="text-red-500">No configurado</span>}</td>
+              </tr>
+              <tr>
+                <td className="py-2 px-4 font-medium">Admin Access Key</td>
+                <td className="py-2 px-4">
+                  {envVars.adminAccessKey ? 
+                    <span className="text-green-500">Configurado (oculto por seguridad)</span> : 
+                    <span className="text-yellow-500">Usando clave por defecto</span>}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Instrucciones</h2>
+        <div className="space-y-4">
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <h3 className="font-medium mb-2">Configurar ADMIN_ACCESS_KEY</h3>
+            <p className="mb-2">Para una mayor seguridad, deberías configurar una clave de administrador personalizada:</p>
+            <ol className="list-decimal pl-5 space-y-2">
+              <li>Añade la variable de entorno <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">ADMIN_ACCESS_KEY</code> con un valor único y complejo.</li>
+              <li>Si estás usando Vercel, añade esta variable en la configuración del proyecto.</li>
+            </ol>
+          </div>
+          
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <h3 className="font-medium mb-2">Actualizar CORS en Sanity</h3>
+            <p className="mb-2">Es importante que configures correctamente CORS en tu proyecto Sanity:</p>
+            <ol className="list-decimal pl-5 space-y-2">
+              <li>Ve a <a href="https://sanity.io/manage" target="_blank" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">sanity.io/manage</a></li>
+              <li>Selecciona tu proyecto</li>
+              <li>Ve a API {'>'} CORS origins</li>
+              <li>Añade tu dominio (<code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">{hostInfo.origin}</code>) con Allow Credentials activado</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p>Si sigues teniendo problemas, comprueba los logs del servidor y la configuración de Sanity.</p>
       </div>
     </div>
   );
