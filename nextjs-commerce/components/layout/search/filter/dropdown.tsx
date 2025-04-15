@@ -26,15 +26,39 @@ export default function FilterItemDropdown({ list }: { list: ListItem[] }) {
   }, []);
 
   useEffect(() => {
+    let foundMatch = false;
+    
     list.forEach((listItem: ListItem) => {
       if (
         ('path' in listItem && pathname === listItem.path) ||
-        ('slug' in listItem && searchParams.get('sort') === listItem.slug)
+        ('slug' in listItem && searchParams.get('sort') === listItem.slug) ||
+        // Comprobar si es una categoría seleccionada
+        ('path' in listItem && 
+         listItem.path.includes('?category=') && 
+         searchParams.get('category') === listItem.path.split('=')[1])
       ) {
         setActive(listItem.title);
+        foundMatch = true;
       }
     });
+    
+    // Si no se encontró coincidencia y hay una opción "Todos", seleccionarla
+    if (!foundMatch) {
+      const defaultOption = list.find(item => 
+        'path' in item && item.path === '/search' && item.title === 'Todos'
+      );
+      
+      if (defaultOption && 'title' in defaultOption) {
+        setActive(defaultOption.title);
+      } else if (list.length > 0 && list[0] && 'title' in list[0]) {
+        // Si no hay opción "Todos", usar el primer elemento de la lista
+        setActive(list[0].title);
+      }
+    }
   }, [pathname, list, searchParams]);
+
+  // Determinar el texto a mostrar en el dropdown
+  const displayText = active || 'Seleccionar';
 
   return (
     <div className="relative" ref={ref}>
@@ -44,7 +68,7 @@ export default function FilterItemDropdown({ list }: { list: ListItem[] }) {
         }}
         className="flex w-full items-center justify-between rounded-sm border border-black/30 px-4 py-2 text-sm dark:border-white/30"
       >
-        <div>{active}</div>
+        <div>{displayText}</div>
         <ChevronDownIcon className="h-4" />
       </div>
       {openSelect && (

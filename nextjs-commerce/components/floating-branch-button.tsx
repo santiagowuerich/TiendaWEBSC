@@ -8,7 +8,8 @@ export default function FloatingBranchButton() {
   
   // Función para determinar si mostrar el botón global de WhatsApp
   const shouldShowGlobalWhatsapp = (path: string): boolean => {
-    return !path.startsWith('/producto/');
+    // Verificar tanto /producto/ como /product/ (ambas posibles rutas para páginas de producto)
+    return !(path.startsWith('/producto/') || path.startsWith('/product/'));
   };
   
   // Si estamos en una página de producto, no renderizar el botón global
@@ -20,6 +21,9 @@ export default function FloatingBranchButton() {
   const whatsappNumber = '5493625281890';
   const whatsappMessage = encodeURIComponent('Hola, me gustaría conocer su catálogo');
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+
+  // Para propósitos de depuración, mostrar en la consola cuando el componente se renderiza
+  console.log('FloatingBranchButton renderizado en:', pathname);
 
   return (
     <BranchButton 

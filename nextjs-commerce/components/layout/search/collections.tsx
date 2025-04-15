@@ -7,6 +7,13 @@ import FilterList from './filter';
 async function CollectionList() {
   const categories = await getAllCategories();
   
+  // Crear una opción "Todo" al inicio (cambiado de "Todos" a "Todo")
+  const allOption = {
+    handle: '',
+    title: 'Todo',
+    path: '/search'
+  };
+  
   // Transformar categorías de Sanity al formato esperado por FilterList
   const formattedCategories = categories.map((category: any) => ({
     handle: category.slug,
@@ -14,7 +21,10 @@ async function CollectionList() {
     path: `/search?category=${category.slug}`
   }));
   
-  return <FilterList list={formattedCategories} title="Categorías" />;
+  // Combinar la opción "Todo" con las categorías
+  const finalList = [allOption, ...formattedCategories];
+  
+  return <FilterList list={finalList} title="Categorías" />;
 }
 
 const skeleton = 'mb-3 h-4 w-5/6 animate-pulse rounded-sm';

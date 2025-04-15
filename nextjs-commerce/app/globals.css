@@ -3,6 +3,17 @@
 @plugin "@tailwindcss/container-queries";
 @plugin "@tailwindcss/typography";
 
+/* Establecer el fondo negro desde el inicio para prevenir flash */
+:root {
+  background-color: #171717; /* neutral-900 en Tailwind */
+  color-scheme: dark;
+}
+
+html, body {
+  background-color: #171717; /* neutral-900 en Tailwind */
+  color-scheme: dark;
+}
+
 @layer base {
   *,
   ::after,
