@@ -1,4 +1,5 @@
 import LogoSquare from 'components/logo-square';
+import { LogoWithText } from 'components/logo-with-text';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import MobileMenu from './mobile-menu';
@@ -46,10 +47,7 @@ export async function Navbar() {
             prefetch={true}
             className="mr-2 flex w-full items-center justify-center md:w-auto lg:mr-6"
           >
-            <LogoSquare />
-            <div className="ml-2 flex-none text-lg font-semibold tracking-wide uppercase md:hidden lg:block">
-              {SITE_NAME}
-            </div>
+            <LogoWithText />
           </Link>
           {menu.length ? (
             <ul className="hidden gap-6 text-base md:flex md:items-center">
@@ -73,7 +71,7 @@ export async function Navbar() {
           </Suspense>
         </div>
         <div className="flex justify-end md:w-1/3">
-          {/* El botón del carrito ha sido eliminado */}
+          {/* Espacio para futuros elementos a la derecha, si es necesario */}
         </div>
       </div>
     </nav>
