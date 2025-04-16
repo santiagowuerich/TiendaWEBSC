@@ -61,7 +61,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-xl bg-[#eceff0]">
+      <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-xl bg-black">
         {validImages.length > 1 ? (
           <>
             <button
@@ -91,7 +91,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
 
         <div className="relative h-full w-full">
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#eceff0] dark:bg-neutral-900 animate-pulse rounded-xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-black animate-pulse rounded-xl">
               <span className="sr-only">Cargando imagen</span>
             </div>
           )}
@@ -104,7 +104,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
             alt={validImages[imageIndex]?.altText || 'Imagen de producto'}
             priority={true}
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg=="
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYGBgAAAABQABIEz98AAAAABJRU5ErkJggg=="
             onLoad={() => setIsLoading(false)}
             unoptimized={isSanityImage}
           />

@@ -52,7 +52,7 @@ export function GridTileImage({
             })}
             {...props}
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg=="
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYGBgAAAABQABIEz98AAAAABJRU5ErkJggg=="
             priority={props.priority}
             alt={props.alt || "Imagen de producto"}
             onLoad={() => setImageLoaded(true)}
