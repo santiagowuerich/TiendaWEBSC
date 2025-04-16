@@ -115,9 +115,7 @@ export async function getAllCategories() {
         title,
         "slug": slug.current,
         description
-      }`,
-      {},
-      { next: { revalidate: 60 } } // Añadir revalidación cada 60 segundos
+      }`
     );
     return categories;
   });
@@ -125,46 +123,42 @@ export async function getAllCategories() {
 
 // Función para obtener todos los productos
 export async function getAllProducts() {
-  return cachedFetch('all-products', async () => {
-    const products = await sanityClient.fetch(
-      `*[_type == "product"] {
-        _id,
-        name,
-        "slug": slug.current,
-        "category": category->slug.current,
-        "categoryTitle": category->title,
-        price,
-        stock,
-        description,
-        image
-      }`
-    );
-    
-    // Procesar imágenes solo una vez y almacenar en caché
-    return products.map(processProductImage);
-  });
+  const products = await sanityClient.fetch(
+    `*[_type == "product" && !(_id in path('drafts.**'))] { // Filtro para excluir borradores
+      _id,
+      name,
+      "slug": slug.current,
+      "category": category->slug.current,
+      "categoryTitle": category->title,
+      price,
+      stock,
+      description,
+      image
+    }`,
+    {},
+    { next: { revalidate: 60 } } // Mantener revalidación
+  );
+  return products.map(processProductImage);
 }
 
 // Función para obtener productos por categoría
 export async function getProductsByCategory(categorySlug: string) {
-  return cachedFetch(`products-by-category-${categorySlug}`, async () => {
-    const products = await sanityClient.fetch(
-      `*[_type == "product" && category->slug.current == $categorySlug] {
-        _id,
-        name,
-        "slug": slug.current,
-        "category": category->slug.current,
-        "categoryTitle": category->title,
-        price,
-        stock,
-        description,
-        image
-      }`,
-      { categorySlug }
-    );
-    
-    return products.map(processProductImage);
-  });
+  const products = await sanityClient.fetch(
+    `*[_type == "product" && category->slug.current == $categorySlug && !(_id in path('drafts.**'))] { // Filtro para excluir borradores
+      _id,
+      name,
+      "slug": slug.current,
+      "category": category->slug.current,
+      "categoryTitle": category->title,
+      price,
+      stock,
+      description,
+      image
+    }`,
+    { categorySlug },
+    { next: { revalidate: 60 } } // Mantener revalidación
+  );
+  return products.map(processProductImage);
 }
 
 // Función para obtener un producto específico por slug

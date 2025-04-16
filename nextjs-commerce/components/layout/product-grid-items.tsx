@@ -7,7 +7,7 @@ export default function ProductGridItems({ products }: { products: any[] }) {
     <>
       {products.map((product) => (
         <Link
-          key={product.handle}
+          key={product.id}
           className="group animate-fadeIn rounded-xl border-0 p-3 shadow-sm transition-all duration-200 hover:shadow-md"
           href={`/product/${product.handle}`}
           prefetch={false}
