@@ -115,7 +115,9 @@ export async function getAllCategories() {
         title,
         "slug": slug.current,
         description
-      }`
+      }`,
+      {},
+      { next: { revalidate: 60 } } // Añadir revalidación cada 60 segundos
     );
     return categories;
   });

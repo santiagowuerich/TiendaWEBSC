@@ -8,11 +8,11 @@ export default function FloatingBranchButton() {
   
   // Función para determinar si mostrar el botón global de WhatsApp
   const shouldShowGlobalWhatsapp = (path: string): boolean => {
-    // Verificar tanto /producto/ como /product/ (ambas posibles rutas para páginas de producto)
-    return !(path.startsWith('/producto/') || path.startsWith('/product/'));
+    // No mostrar en páginas de producto ni en el Studio
+    return !(path.startsWith('/producto/') || path.startsWith('/product/') || path.startsWith('/studio'));
   };
   
-  // Si estamos en una página de producto, no renderizar el botón global
+  // Si estamos en una página de producto o en el Studio, no renderizar el botón global
   if (!shouldShowGlobalWhatsapp(pathname)) {
     return null;
   }
