@@ -24,7 +24,7 @@ type SanityProduct = ReturnType<typeof formatSanityProduct>;
 function ThreeItemGridItemPlaceholder({ size }: { size: 'full' | 'half' }) {
   return (
     <div
-      className={clsx('relative aspect-square overflow-hidden rounded-2xl bg-neutral-900 animate-pulse', {
+      className={clsx('relative aspect-square overflow-hidden rounded-2xl bg-[#eceff0] dark:bg-neutral-800 animate-pulse', {
         'md:col-span-4 md:row-span-2': size === 'full',
         'md:col-span-2 md:row-span-1': size === 'half'
       })}
@@ -43,7 +43,7 @@ function ThreeItemGridItem({
 }) {
   return (
     <div
-      className={clsx('relative aspect-square overflow-hidden rounded-2xl bg-neutral-900 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]', {
+      className={clsx('relative aspect-square overflow-hidden rounded-2xl bg-[#eceff0] shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]', {
         'md:col-span-4 md:row-span-2': size === 'full',
         'md:col-span-2 md:row-span-1': size === 'half'
       })}

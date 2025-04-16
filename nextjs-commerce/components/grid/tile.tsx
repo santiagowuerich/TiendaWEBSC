@@ -34,7 +34,7 @@ export function GridTileImage({
   return (
     <div
       className={clsx(
-        'group relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-neutral-900',
+        'group relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-[#eceff0] dark:bg-neutral-800',
         {
           'shadow-[0_0_0_2px_#6b7280] dark:shadow-[0_0_0_2px_#6b7280]': active,
           'shadow-lg hover:shadow-xl transition-shadow duration-300': !active
@@ -43,7 +43,7 @@ export function GridTileImage({
       style={{ contain: 'paint' }} // Optimiza la capa de pintura
     >
       {hasValidSrc ? (
-        <div className="relative h-full w-full bg-neutral-900">
+        <div className="relative h-full w-full">
           <Image
             className={clsx('h-full w-full object-cover rounded-lg', {
               'transition duration-300 ease-in-out group-hover:scale-105': isInteractive,
@@ -52,7 +52,7 @@ export function GridTileImage({
             })}
             {...props}
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYGBgAAAABQABIEz98AAAAABJRU5ErkJggg=="
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
             priority={props.priority}
             alt={props.alt || "Imagen de producto"}
             onLoad={() => setImageLoaded(true)}
@@ -60,7 +60,7 @@ export function GridTileImage({
           />
         </div>
       ) : (
-        <div className="flex h-full w-full items-center justify-center bg-neutral-900">
+        <div className="flex h-full w-full items-center justify-center">
           <span className="text-sm text-neutral-500">Sin imagen</span>
         </div>
       )}
