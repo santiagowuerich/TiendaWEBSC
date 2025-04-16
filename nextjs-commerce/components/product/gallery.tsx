@@ -104,7 +104,7 @@ export function Gallery({ images }: { images: { src: string; altText: string }[]
             alt={validImages[imageIndex]?.altText || 'Imagen de producto'}
             priority={true}
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
             onLoad={() => setIsLoading(false)}
             unoptimized={isSanityImage}
           />
