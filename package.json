@@ -2,6 +2,13 @@
 	"dependencies": {
 		"@portabletext/types": "^2.0.13",
 		"next-intl": "^4.0.2",
-		"react-icons": "^5.5.0"
-	}
+		"react-icons": "^5.5.0",
+		"esbuild": ">=0.25.0",
+		"prismjs": ">=1.30.0"
+	},
+	"overrides": {
+      "esbuild": ">=0.25.0",
+      "prismjs": ">=1.30.0"
+    }
+
 }
