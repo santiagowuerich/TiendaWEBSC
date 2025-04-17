@@ -141,10 +141,11 @@ export async function getAllProducts() {
   return products.map(processProductImage);
 }
 
-// Función para obtener productos por categoría
+// Función para obtener productos por categoría (sin cachedFetch y con filtro)
 export async function getProductsByCategory(categorySlug: string) {
+  console.log(`[DEBUG] Fetching products for category slug: ${categorySlug}`); // Log de entrada
   const products = await sanityClient.fetch(
-    `*[_type == "product" && category->slug.current == $categorySlug && !(_id in path('drafts.**'))] { // Filtro para excluir borradores
+    `*[_type == "product" && category->slug.current == $categorySlug && !(_id in path('drafts.**'))] {
       _id,
       name,
       "slug": slug.current,
@@ -156,32 +157,33 @@ export async function getProductsByCategory(categorySlug: string) {
       image
     }`,
     { categorySlug },
-    { next: { revalidate: 60 } } // Mantener revalidación
+    { next: { revalidate: 60 } } // Revalidación de 60 segundos
   );
+  console.log(`[DEBUG] Found ${products.length} products for slug ${categorySlug}`); // Log de salida
   return products.map(processProductImage);
 }
 
-// Función para obtener un producto específico por slug
+// Función para obtener un producto específico por slug (sin cachedFetch y con filtro)
 export async function getProductBySlug(slug: string) {
-  return cachedFetch(`product-${slug}`, async () => {
-    const product = await sanityClient.fetch(
-      `*[_type == "product" && slug.current == $slug][0] {
-        _id,
-        name,
-        "slug": slug.current,
-        "category": category->slug.current,
-        "categoryTitle": category->title,
-        price,
-        stock,
-        description,
-        image
-      }`,
-      { slug }
-    );
-    
-    if (!product) return null;
-    return processProductImage(product);
-  });
+  console.log(`[DEBUG] Fetching product for slug: ${slug}`); // Log de entrada
+  const product = await sanityClient.fetch(
+    `*[_type == "product" && slug.current == $slug && !(_id in path('drafts.**'))][0] { // Filtro para excluir borradores
+      _id,
+      name,
+      "slug": slug.current,
+      "category": category->slug.current,
+      "categoryTitle": category->title,
+      price,
+      stock,
+      description,
+      image
+    }`,
+    { slug },
+    { next: { revalidate: 60 } } // Revalidación de 60 segundos
+  );
+  console.log(`[DEBUG] Found product for slug ${slug}:`, !!product); // Log de salida
+  if (!product) return null;
+  return processProductImage(product);
 }
 
 // Función para convertir un producto de Sanity a un formato compatible con la interfaz
