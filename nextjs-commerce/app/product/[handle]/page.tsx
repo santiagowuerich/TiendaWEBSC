@@ -111,6 +111,16 @@ export default async function Page({ params }: PageProps) {
             </div>
           </div>
 
+          {/* Product Description Section - Moved Here */}
+          {product.description && (
+            <div className="mt-10 md:mt-12 rounded-xl bg-white dark:bg-neutral-900 p-6 md:p-8 shadow-lg">
+              <h2 className="mb-4 text-2xl font-semibold text-neutral-900 dark:text-white">Descripción</h2>
+              <div className="prose prose-neutral max-w-none dark:prose-invert">
+                <p className="text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">{product.description}</p>
+              </div>
+            </div>
+          )}
+
           <Suspense
             fallback={
               <div className="mt-16 text-center">

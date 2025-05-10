@@ -33,10 +33,10 @@ export function middleware(request: NextRequest) {
     // 2. Determinar si el usuario está autorizado
     const isAuthorizedByCookie = authCookie === adminKeyEnv;
     const isAuthorizedByParam = accessKeyParam === adminKeyEnv;
-    const isAuthorizedByLocalDev = isLocalhost && isDevelopment;
-    const isAuthorized = isAuthorizedByCookie || isAuthorizedByParam || isAuthorizedByLocalDev;
+    const isAuthorizedByLocalDev = isLocalhost && isDevelopment; // Mantenemos el cálculo por si lo necesitamos en logs
+    const isAuthorized = isAuthorizedByCookie || isAuthorizedByParam; // Eliminamos isAuthorizedByLocalDev de la autorización
 
-    console.log(`[Middleware] Authorization check: isAuthorizedByCookie=${isAuthorizedByCookie}, isAuthorizedByParam=${isAuthorizedByParam}, isAuthorizedByLocalDev=${isAuthorizedByLocalDev} => isAuthorized=${isAuthorized}`);
+    console.log(`[Middleware] Authorization check: isAuthorizedByCookie=${isAuthorizedByCookie}, isAuthorizedByParam=${isAuthorizedByParam}, isAuthorizedByLocalDev=${isAuthorizedByLocalDev} => isAuthorized=${isAuthorized} (LocalDev ignored for auth)`);
 
     // 3. Si no está autorizado, redirigir a la página principal
     if (!isAuthorized) {

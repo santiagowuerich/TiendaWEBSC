@@ -4,6 +4,26 @@ import Prose from 'components/prose';
 import { FaWhatsapp } from 'react-icons/fa';
 // import { Product } from 'lib/shopify/types'; // Eliminado
 
+// Función para calcular precios con recargo y cuotas
+function calculateInstallmentPayments(basePrice: number) {
+  const priceWithSurcharge3 = basePrice * 1.20;
+  const installment3 = priceWithSurcharge3 / 3;
+
+  const priceWithSurcharge6 = basePrice * 1.30;
+  const installment6 = priceWithSurcharge6 / 6;
+
+  return {
+    installments3: {
+      totalPrice: priceWithSurcharge3.toFixed(2),
+      installmentPrice: installment3.toFixed(2),
+    },
+    installments6: {
+      totalPrice: priceWithSurcharge6.toFixed(2),
+      installmentPrice: installment6.toFixed(2),
+    }
+  };
+}
+
 // Componente para el botón de WhatsApp
 function WhatsAppButton({ product }: { product: any }) {
   // Formatear el mensaje con información del producto
@@ -29,29 +49,42 @@ function WhatsAppButton({ product }: { product: any }) {
 }
 
 export function ProductDescription({ product }: { product: any }) {
+  const basePrice = parseFloat(product.priceRange.maxVariantPrice.amount);
+  const paymentOptions = calculateInstallmentPayments(basePrice);
+
   return (
     <>
-      <div className="mb-8 flex flex-col border-b border-neutral-300 pb-6 dark:border-neutral-00">
-        <h1 className="mb-5 text-4xl font-bold tracking-tight text-neutral-900 dark:text-white md:text-5xl">{product.title}</h1>
-        <div className="mb-4 flex items-center">
-          <div className="rounded-xl bg-blue-600 px-6 py-3 text-xl font-bold text-white shadow-md">
+      <div className="flex flex-col">
+        <h1 className="mb-5 text-center text-4xl font-bold tracking-tight text-neutral-900 dark:text-white md:text-5xl">{product.title}</h1>
+        
+        {/* Main Price Box */}
+        <div className="mb-3 w-full rounded-xl bg-blue-600 px-6 py-3 text-center text-white shadow-md">
           <Price
             amount={product.priceRange.maxVariantPrice.amount}
-            currencyCode={product.priceRange.maxVariantPrice.currencyCode}
+            currencyCode={product.priceRange.maxVariantPrice.currencyCode} // Kept for number formatting (e.g., $ symbol)
+            currencyCodeClassName="hidden" // Hide the "ARS" text part from Price component
+            className="text-xl font-bold" // Apply to the <p> tag rendered by Price component
           />
+          <span className="mt-1 block text-xs font-normal opacity-90">Transferencia o Efectivo</span>
         </div>
-      </div>
-      </div>
-      
-      {/* Mostrar descripción del producto */}
-      {product.description ? (
-        <div className="mb-10 rounded-xl bg-neutral-50 p-8 shadow-md dark:bg-neutral-900">
-          <h2 className="mb-4 text-2xl font-semibold text-neutral-900 dark:text-white">Descripción</h2>
-          <div className="prose prose-neutral max-w-none dark:prose-invert">
-            <p className="text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">{product.description}</p>
+
+        {/* Installment Options Container */}
+        <div className="flex w-full flex-col space-y-3">
+          {/* 3 Installments Box */}
+          <div className="w-full rounded-xl bg-blue-600 px-6 py-3 text-center text-xl font-bold text-white shadow-md">
+            <p> 
+              3 cuotas de ${paymentOptions.installments3.installmentPrice}
+            </p>
+          </div>
+          
+          {/* 6 Installments Box */}
+          <div className="w-full rounded-xl bg-blue-600 px-6 py-3 text-center text-xl font-bold text-white shadow-md">
+            <p>
+              6 cuotas de ${paymentOptions.installments6.installmentPrice}
+            </p>
           </div>
         </div>
-      ) : null}
+      </div>
       
       {/* Botón de WhatsApp */}
       <div className="mt-10">

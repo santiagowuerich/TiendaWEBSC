@@ -42,13 +42,18 @@ export const productType = defineType({
       validation: (Rule) => Rule.min(0).integer().error('El stock debe ser un número entero positivo.'),
     }),
     defineField({
-      name: 'image',
-      title: 'Imagen Principal',
-      type: 'image',
-      options: {
-        hotspot: true, // Permite seleccionar el punto focal de la imagen
-      },
-      validation: (Rule) => Rule.required().error('La imagen es obligatoria.'),
+      name: 'images',
+      title: 'Imágenes del Producto',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          }
+        }
+      ],
+      validation: (Rule) => Rule.required().min(1).error('Se requiere al menos una imagen.'),
     }),
     defineField({
       name: 'description',
