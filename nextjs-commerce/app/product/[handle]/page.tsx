@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
+import { PortableText } from '@portabletext/react';
 
 import { GridTileImage } from '../../../components/grid/tile';
 import Footer from '../../../components/layout/footer';
@@ -12,6 +13,7 @@ import {
   getAllProducts,
   formatSanityProduct,
   FormattedProduct,
+  SanityProductForFormatting,
   SanityProduct,
 } from '../../../lib/sanity';
 import Link from 'next/link';
@@ -19,33 +21,37 @@ import Link from 'next/link';
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  const products = await getAllProducts();
-  return products.map((product: SanityProduct) => ({
-    handle: product.slug,
+  const productsFromSanity = await getAllProducts();
+  const formattedProducts = productsFromSanity.map((p: SanityProductForFormatting) => formatSanityProduct(p));
+  return formattedProducts.map((product: FormattedProduct) => ({
+    handle: product.handle,
   }));
 }
 
 interface PageProps {
-  params: Promise<{ handle: string }>;
+  params: { handle: string };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { handle } = await params;
+  const resolvedParams = await Promise.resolve(params);
+  const { handle } = resolvedParams;
   
   const sanityProduct = await getProductBySlug(handle);
   if (!sanityProduct) return notFound();
 
-  const product = formatSanityProduct(sanityProduct);
-  const { url } = product.featuredImage || {};
+  const product = formatSanityProduct(sanityProduct as SanityProductForFormatting);
+
+  const firstImage = product.images && product.images.length > 0 ? product.images[0] : null;
+  const imageUrl = firstImage?.src;
 
   return {
     title: product.title,
-    description: product.description || '',
-    openGraph: url
+    description: product.description ? JSON.stringify(product.description) : undefined,
+    openGraph: imageUrl
       ? {
           images: [
             {
-              url,
+              url: imageUrl,
               width: 900,
               height: 900,
               alt: product.title,
@@ -57,19 +63,38 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function Page({ params }: PageProps) {
-  const { handle } = await params;
+  const resolvedParams = await Promise.resolve(params);
+  const { handle } = resolvedParams;
   
-  const sanityProduct = await getProductBySlug(handle);
-  if (!sanityProduct) return notFound();
+  const sanityProductRaw = await getProductBySlug(handle);
+  
+  console.log("LOG 1 - SANITY PRODUCT RAW:", JSON.stringify(sanityProductRaw, null, 2));
+  
+  if (!sanityProductRaw) {
+    console.log("LOG - Producto no encontrado en Sanity para el handle:", handle);
+    notFound();
+    return null;
+  }
 
-  const product = formatSanityProduct(sanityProduct);
+  const product = formatSanityProduct(sanityProductRaw as SanityProductForFormatting);
+  
+  console.log("LOG 2 - FORMATTED PRODUCT DESCRIPTION:", JSON.stringify(product.description, null, 2));
+  
+  console.log("LOG 2.1 - ¿Description existe?:", !!product.description);
+  console.log("LOG 2.2 - ¿Description es un array?:", Array.isArray(product.description));
+  if (Array.isArray(product.description)) {
+    console.log("LOG 2.3 - Longitud del array description:", product.description.length);
+  }
+
+  const firstImage = product.images && product.images.length > 0 ? product.images[0] : null;
+  const imageUrlForJsonLd = firstImage?.src;
 
   const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.title,
-    description: product.description || '',
-    image: product.featuredImage.url,
+    description: product.description ? JSON.stringify(product.description) : undefined,
+    image: imageUrlForJsonLd,
     offers: {
       '@type': 'Offer',
       price: product.priceRange.maxVariantPrice.amount,
@@ -77,6 +102,8 @@ export default async function Page({ params }: PageProps) {
       availability: 'https://schema.org/InStock',
     },
   };
+
+  const validGalleryImages = product.images.filter(img => typeof img.src === 'string' && img.src !== '') as { src: string; altText: string }[];
 
   return (
     <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16 text-center">Cargando detalles del producto...</div>}>
@@ -94,12 +121,7 @@ export default async function Page({ params }: PageProps) {
                 }
               >
                 <Gallery
-                  images={[
-                    {
-                      src: product.featuredImage.url || '',
-                      altText: product.title,
-                    },
-                  ]}
+                  images={validGalleryImages}
                 />
               </Suspense>
             </div>
@@ -111,13 +133,27 @@ export default async function Page({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Product Description Section - Moved Here */}
-          {product.description && (
+          {(() => {
+            if (typeof window === 'undefined') {
+              console.log("LOG 3 (SSR) - VALOR DE product.description ANTES DE RENDERIZAR:", JSON.stringify(product.description, null, 2));
+            }
+            return null;
+          })()}
+
+          {product.description && Array.isArray(product.description) && product.description.length > 0 ? (
             <div className="mt-10 md:mt-12 rounded-xl bg-white dark:bg-neutral-900 p-6 md:p-8 shadow-lg">
               <h2 className="mb-4 text-2xl font-semibold text-neutral-900 dark:text-white">Descripción</h2>
               <div className="prose prose-neutral max-w-none dark:prose-invert">
-                <p className="text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">{product.description}</p>
+                <PortableText value={product.description} />
               </div>
+            </div>
+          ) : (
+            <div className="mt-10 md:mt-12 rounded-xl bg-red-100 dark:bg-red-900 p-6 md:p-8 shadow-lg">
+              <h2 className="mb-4 text-2xl font-semibold text-red-900 dark:text-white">No hay descripción disponible</h2>
+              <p>La descripción de este producto no está disponible o no cumple con el formato requerido.</p>
+              <p>Condiciones: product.description={!!product.description ? "existe" : "no existe"}, 
+                 Array.isArray={Array.isArray(product.description) ? "sí" : "no"}, 
+                 Length={Array.isArray(product.description) ? product.description.length : "N/A"}</p>
             </div>
           )}
 
@@ -143,25 +179,17 @@ async function RelatedProducts({
   currentProductId: string;
 }) {
   try {
-    const allProducts = await getAllProducts();
+    const allSanityProducts = await getAllProducts();
 
-    if (!allProducts || !allProducts.length) {
-      console.error('No hay productos disponibles');
+    if (!allSanityProducts || !allSanityProducts.length) {
+      console.error('No hay productos disponibles para RelatedProducts');
       return null;
     }
-
-    const relatedProducts = allProducts
-      .filter((product: SanityProduct) => product._id !== currentProductId)
-      .slice(0, 4)
-      .map((product: any) => {
-        try {
-          return formatSanityProduct(product);
-        } catch (err) {
-          console.error('Error al formatear producto:', err);
-          return null;
-        }
-      })
-      .filter(Boolean);
+    
+    const relatedProducts = allSanityProducts
+      .map((p: SanityProductForFormatting) => formatSanityProduct(p))
+      .filter((formattedP: FormattedProduct) => formattedP.id !== currentProductId)
+      .slice(0, 4);
 
     if (!relatedProducts.length) return null;
 
@@ -171,23 +199,23 @@ async function RelatedProducts({
           También te puede interesar
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {relatedProducts.map((product: FormattedProduct) => (
+          {relatedProducts.map((relatedProduct: FormattedProduct) => (
             <Link
-              key={product.handle}
-              href={`/product/${product.handle}`}
+              key={relatedProduct.handle}
+              href={`/product/${relatedProduct.handle}`}
               className="group overflow-hidden rounded-2xl bg-[#eceff0] shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
             >
               <div className="aspect-square relative bg-[#eceff0]">
                 <GridTileImage
-                  alt={product.title}
+                  alt={relatedProduct.title}
                   label={{
-                    title: product.title,
+                    title: relatedProduct.title,
                     amount:
-                      product.priceRange.maxVariantPrice.amount,
+                      relatedProduct.priceRange.maxVariantPrice.amount,
                     currencyCode:
-                      product.priceRange.maxVariantPrice.currencyCode,
+                      relatedProduct.priceRange.maxVariantPrice.currencyCode,
                   }}
-                  src={product.featuredImage.url || ''}
+                  src={relatedProduct.images[0]?.src || ''}
                   fill
                   sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
                   className="aspect-square object-cover"

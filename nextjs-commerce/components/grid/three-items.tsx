@@ -1,6 +1,6 @@
 import { GridTileImage } from 'components/grid/tile';
 import Link from 'next/link';
-import { getAllProducts, formatSanityProduct } from 'lib/sanity';
+import { getAllProducts, formatSanityProduct, FormattedProduct, SanityProductForFormatting } from 'lib/sanity';
 import clsx from 'clsx';
 import { Suspense } from 'react';
 
@@ -37,7 +37,7 @@ function ThreeItemGridItem({
   size,
   priority
 }: {
-  item: SanityProduct;
+  item: FormattedProduct;
   size: 'full' | 'half';
   priority?: boolean;
 }) {
@@ -50,7 +50,7 @@ function ThreeItemGridItem({
     >
       <Link className="relative h-full w-full" href={`/product/${item.handle}`}>
         <GridTileImage
-          src={item.featuredImage.url || ''}
+          src={item.images && item.images.length > 0 ? item.images[0]?.src || '' : ''}
           fill
           sizes={
             size === 'full'
@@ -102,18 +102,45 @@ async function GridItems() {
 }
 
 // Componente principal con Suspense
-export function ThreeItemGrid() {
+export async function ThreeItemGrid() {
+  // Collections that start with `hidden-*` are hidden from the search page.
+  // const homepageItems = await getCollectionProducts({ // Shopify, no se usa
+  //   collection: 'hidden-homepage-featured-items'
+  // });
+
+  // Obtener todos los productos de Sanity y formatearlos
+  const rawProducts = await getAllProducts();
+  if (!rawProducts || rawProducts.length === 0) {
+    console.warn("ThreeItemGrid: No products found from Sanity.");
+    // Retornar un placeholder o un mensaje si no hay productos
+    return (
+      <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
+         <div className="md:col-span-4 md:row-span-2 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse flex items-center justify-center"><p className="text-gray-500">No hay productos destacados disponibles.</p></div>
+         <div className="md:col-span-2 md:row-span-1 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+         <div className="md:col-span-2 md:row-span-1 rounded-lg bg-gray-200 dark:bg-gray-800 animate-pulse"></div>
+      </section>
+    );
+  }
+  
+  // Tipar 'p' explícitamente
+  const sanityProducts = rawProducts.map((p: SanityProductForFormatting) => formatSanityProduct(p)); 
+
+  if (sanityProducts.length < 3) {
+    console.warn(
+      `ThreeItemGrid: Not enough products for full layout. Expected 3, got ${sanityProducts.length}`
+    );
+    // Adaptar o mostrar un mensaje si hay menos de 3 productos. Por ahora, se usa la lógica de repetición.
+  }
+  
+  const firstItem = sanityProducts[0];
+  const secondItem = sanityProducts.length > 1 ? sanityProducts[1] : firstItem; 
+  const thirdItem = sanityProducts.length > 2 ? sanityProducts[2] : secondItem; 
+
   return (
-    <section className="mx-auto grid max-w-7xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
-      <Suspense fallback={
-        <>
-          <ThreeItemGridItemPlaceholder size="full" />
-          <ThreeItemGridItemPlaceholder size="half" />
-          <ThreeItemGridItemPlaceholder size="half" />
-        </>
-      }>
-        <GridItems />
-      </Suspense>
+    <section className="mx-auto grid max-w-screen-2xl gap-4 px-4 pb-4 md:grid-cols-6 md:grid-rows-2">
+      <ThreeItemGridItem size="full" item={firstItem} priority={true} />
+      <ThreeItemGridItem size="half" item={secondItem} priority={true} />
+      <ThreeItemGridItem size="half" item={thirdItem} />
     </section>
   );
 }

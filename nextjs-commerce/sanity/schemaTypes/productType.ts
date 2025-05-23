@@ -58,7 +58,45 @@ export const productType = defineType({
     defineField({
       name: 'description',
       title: 'Descripción',
-      type: 'text',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            {title: 'Normal', value: 'normal'},
+            {title: 'Título 2', value: 'h2'},
+            {title: 'Título 3', value: 'h3'},
+            {title: 'Título 4', value: 'h4'},
+            {title: 'Cita', value: 'blockquote'}
+          ],
+          lists: [
+            {title: 'Viñetas', value: 'bullet'},
+            {title: 'Numerada', value: 'number'}
+          ],
+          marks: {
+            decorators: [
+              {title: 'Negrita', value: 'strong'},
+              {title: 'Cursiva', value: 'em'},
+              {title: 'Subrayado', value: 'underline'},
+              {title: 'Tachado', value: 'strike-through'}
+            ],
+            annotations: [
+              {
+                name: 'link',
+                type: 'object',
+                title: 'Enlace',
+                fields: [
+                  {
+                    name: 'href',
+                    type: 'url',
+                    title: 'URL'
+                  }
+                ]
+              }
+            ]
+          }
+        },
+      ]
     }),
   ],
 }) 

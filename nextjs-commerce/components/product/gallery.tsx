@@ -1,151 +1,124 @@
 'use client';
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import { GridTileImage } from 'components/grid/tile';
 import { useProduct, useUpdateURL } from 'components/product/product-context';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 export function Gallery({ images }: { images: { src: string; altText: string }[] }) {
-  if (!images?.length) return null;
+  // Filtro inicial más robusto para imágenes válidas
+  const validImages = images.filter(img => img && typeof img.src === 'string' && img.src.trim() !== '');
 
-  // Filtra imágenes sin URL
-  const validImages = images.filter(img => img.src);
-  if (!validImages.length) return (
-    <div className="flex flex-col gap-4">
+  if (!validImages.length) {
+    return (
       <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-xl bg-[#eceff0] flex items-center justify-center">
         <span className="text-neutral-500">Imagen no disponible</span>
       </div>
-    </div>
-  );
+    );
+  }
 
   const { state, updateImage } = useProduct();
   const updateURL = useUpdateURL();
-  const imageIndex = state.image ? parseInt(state.image) : 0;
+  
+  // Asegurar que imageIndex esté dentro de los límites de validImages
+  let initialImageIndex = state.image ? parseInt(state.image) : 0;
+  if (initialImageIndex < 0 || initialImageIndex >= validImages.length) {
+    initialImageIndex = 0;
+  }
+  const [imageIndex, setImageIndexState] = useState(initialImageIndex);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [mainImage, ...otherImages] = validImages;
+  // Actualizar el imageIndex del contexto y la URL
+  const setCurrentImage = (index: number) => {
+    setImageIndexState(index);
+    updateImage(index.toString());
+    updateURL('image', index.toString());
+  };
 
   const nextImageIndex = imageIndex + 1 < validImages.length ? imageIndex + 1 : 0;
   const previousImageIndex = imageIndex === 0 ? validImages.length - 1 : imageIndex - 1;
 
   const buttonClassName =
-    'h-full px-6 transition-all ease-in-out hover:scale-110 hover:text-black dark:hover:text-white flex items-center justify-center';
+    'h-full px-6 transition-all ease-in-out text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white flex items-center justify-center';
 
-  // Verificar si la imagen actual es de Sanity
-  const isSanityImage = validImages[imageIndex]?.src && 
-    typeof validImages[imageIndex].src === 'string' && 
-    validImages[imageIndex].src.includes('cdn.sanity.io') ? true : false;
+  const currentImageSrc = validImages[imageIndex]?.src;
+  const currentImageAlt = validImages[imageIndex]?.altText || 'Imagen de producto';
+  const isSanityImage = currentImageSrc?.includes('cdn.sanity.io') ?? false;
 
-  // Precarga de imágenes para navegación más fluida
   useEffect(() => {
-    // Precarga la imagen anterior y siguiente
-    if (validImages.length > 1) {
-      const preloadImage = (src: string) => {
-        if (!src) return;
-        const img = new window.Image();
-        img.src = src;
-      };
-      
-      // Precarga la siguiente imagen
-      if (validImages[nextImageIndex]?.src) {
-        preloadImage(validImages[nextImageIndex].src);
-      }
-      
-      // Precarga la imagen anterior
-      if (validImages[previousImageIndex]?.src) {
-        preloadImage(validImages[previousImageIndex].src);
-      }
+    // Cuando cambia el imageIndex (y por ende, currentImageSrc), reinicia isLoading.
+    if (currentImageSrc) {
+      setIsLoading(true);
     }
-  }, [imageIndex, nextImageIndex, previousImageIndex, validImages]);
+  }, [imageIndex, currentImageSrc]); // Depender de imageIndex o currentImageSrc
+  
+  // Efecto para precargar imágenes (opcional pero bueno para UX)
+  useEffect(() => {
+    if (validImages.length > 1) {
+      const preload = (srcCandidate: string | undefined) => {
+        if (srcCandidate) new window.Image().src = srcCandidate;
+      };
+      preload(validImages[nextImageIndex]?.src);
+      preload(validImages[previousImageIndex]?.src);
+    }
+  }, [nextImageIndex, previousImageIndex, validImages]);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="relative aspect-square h-full max-h-[550px] w-full overflow-hidden rounded-xl bg-[#eceff0]">
-        {validImages.length > 1 ? (
+        {validImages.length > 1 && (
           <>
             <button
-              aria-label="previous"
+              aria-label="Previous Product Image"
               className={`${buttonClassName} absolute left-0 top-0 z-10`}
-              onClick={(event) => {
-                event.stopPropagation();
-                updateImage(previousImageIndex.toString());
-                updateURL('image', previousImageIndex.toString());
-              }}
+              onClick={() => setCurrentImage(previousImageIndex)}
             >
-              <ArrowLeftIcon className="h-6" />
+              <ArrowLeftIcon className="h-6 w-6" />
             </button>
             <button
-              aria-label="next"
+              aria-label="Next Product Image"
               className={`${buttonClassName} absolute right-0 top-0 z-10`}
-              onClick={(event) => {
-                event.stopPropagation();
-                updateImage(nextImageIndex.toString());
-                updateURL('image', nextImageIndex.toString());
-              }}
+              onClick={() => setCurrentImage(nextImageIndex)}
             >
-              <ArrowRightIcon className="h-6" />
+              <ArrowRightIcon className="h-6 w-6" />
             </button>
           </>
-        ) : null}
+        )}
 
         <div className="relative h-full w-full">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-[#eceff0] dark:bg-neutral-900 animate-pulse rounded-xl">
-              <span className="sr-only">Cargando imagen</span>
+              <span className="sr-only">Cargando...</span>
             </div>
           )}
           <div className="absolute inset-0 rounded-xl border border-neutral-200 dark:border-neutral-00" />
-          <Image
-            className={`h-full w-full object-contain transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-            fill
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            src={validImages[imageIndex]?.src || ''}
-            alt={validImages[imageIndex]?.altText || 'Imagen de producto'}
-            priority={true}
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-            onLoad={() => setIsLoading(false)}
-            unoptimized={isSanityImage}
-          />
+          {currentImageSrc && (
+            <Image
+              key={currentImageSrc} // Añadir key para forzar re-renderizado si src cambia mucho
+              className={`h-full w-full object-contain transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              src={currentImageSrc}
+              alt={currentImageAlt}
+              priority={true}
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+              onLoad={() => setIsLoading(false)}
+              onError={() => {
+                setIsLoading(false);
+                console.error("Error al cargar imagen:", currentImageSrc);
+              }}
+              unoptimized={isSanityImage}
+            />
+          )}
+          {!currentImageSrc && !isLoading && (
+             <div className="flex items-center justify-center h-full w-full">
+               <span className="text-neutral-500">Error al cargar imagen principal</span>
+             </div>
+          )}
         </div>
       </div>
-
-      {validImages.length > 1 ? (
-        <ul className="flex items-center justify-center gap-2 overflow-auto py-1">
-          {validImages.map((image, index) => {
-            const isActive = index === imageIndex;
-            const isThumbnailSanityImage = image.src && 
-              typeof image.src === 'string' && 
-              image.src.includes('cdn.sanity.io') ? true : false;
-              
-            return (
-              <li key={image.src} className="h-20 w-20">
-                <button
-                  aria-label={`Go to image ${index + 1}`}
-                  aria-current={isActive}
-                  className="h-full w-full"
-                  onClick={() => {
-                    updateImage(index.toString());
-                    updateURL('image', index.toString());
-                  }}
-                >
-                  <GridTileImage
-                    alt={image.altText || ''}
-                    src={image.src}
-                    fill
-                    sizes="(min-width: 1024px) 20vw, 20vw"
-                    isInteractive={!isActive}
-                    active={isActive}
-                    priority={index < 4} // Solo priorizar las primeras 4 miniaturas
-                    unoptimized={isThumbnailSanityImage}
-                  />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
+      {/* Miniaturas eliminadas */}
     </div>
   );
 }

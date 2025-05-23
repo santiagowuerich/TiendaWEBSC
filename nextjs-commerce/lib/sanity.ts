@@ -27,13 +27,13 @@ export interface FormattedProduct {
   id: string;
   handle: string;
   title: string;
-  description?: string;
+  description?: any;
   category: string;
   categoryTitle: string;
-  featuredImage: {
-    url: string | undefined;
+  images: Array<{
+    src: string | undefined;
     altText: string;
-  };
+  }>;
   priceRange: {
     maxVariantPrice: {
       amount: string;
@@ -81,31 +81,6 @@ async function cachedFetch<T>(
   return data;
 }
 
-// Procesar la imagen para un producto de manera optimizada
-function processProductImage(product: any) {
-  try {
-    let imageUrl = '';
-    if (product.image && product.image.asset) {
-      imageUrl = urlFor(product.image).url();
-      
-      if (imageUrl && !imageUrl.startsWith('http')) {
-        imageUrl = `https:${imageUrl}`;
-      }
-    }
-    
-    return {
-      ...product,
-      imageUrl
-    };
-  } catch (error) {
-    console.error('Error al procesar imagen para producto:', product._id, error);
-    return {
-      ...product,
-      imageUrl: ''
-    };
-  }
-}
-
 // Función para obtener todas las categorías
 export async function getAllCategories() {
   return cachedFetch('all-categories', async () => {
@@ -133,12 +108,12 @@ export async function getAllProducts() {
       price,
       stock,
       description,
-      image
+      images // Cambiado de image a images
     }`,
     {},
     { next: { revalidate: 60 } } // Mantener revalidación
   );
-  return products.map(processProductImage);
+  return products;
 }
 
 // Función para obtener productos por categoría (sin cachedFetch y con filtro)
@@ -154,13 +129,13 @@ export async function getProductsByCategory(categorySlug: string) {
       price,
       stock,
       description,
-      image
+      images // Cambiado de image a images
     }`,
     { categorySlug },
     { next: { revalidate: 60 } } // Revalidación de 60 segundos
   );
   console.log(`[DEBUG] Found ${products.length} products for slug ${categorySlug}`); // Log de salida
-  return products.map(processProductImage);
+  return products;
 }
 
 // Función para obtener un producto específico por slug (sin cachedFetch y con filtro)
@@ -176,36 +151,116 @@ export async function getProductBySlug(slug: string) {
       price,
       stock,
       description,
-      image
+      images // Cambiado de image a images
     }`,
     { slug },
     { next: { revalidate: 60 } } // Revalidación de 60 segundos
   );
   console.log(`[DEBUG] Found product for slug ${slug}:`, !!product); // Log de salida
   if (!product) return null;
-  return processProductImage(product);
+  return product;
+}
+
+// SanityProduct (asumiendo que se usa como tipo de entrada para formatSanityProduct)
+// Esta interfaz debería coincidir con lo que devuelve tu consulta GROQ
+export interface SanityProductForFormatting {
+  _id: string;
+  name: string;
+  slug: string; // Asumiendo que slug es un string después de la consulta
+  description?: any; // Portable Text
+  category?: string;
+  categoryTitle?: string;
+  images?: any[]; // Array de imágenes de Sanity (contienen asset._ref)
+  price: number;
+  // Agrega otros campos que tu consulta GROQ devuelve
 }
 
 // Función para convertir un producto de Sanity a un formato compatible con la interfaz
-export function formatSanityProduct(product: SanityProduct): FormattedProduct {
-  // Asegurarse de que imageUrl no sea null/undefined
-  const imageUrl = product.imageUrl || '';
+export function formatSanityProduct(product: SanityProductForFormatting): FormattedProduct {
   
+  const processedImages = (product.images || []).map(imageSource => {
+    let imageUrl = '';
+    if (imageSource && imageSource.asset) {
+      try {
+        imageUrl = urlFor(imageSource).url(); 
+        
+        if (imageUrl && imageUrl.startsWith('//')) {
+          imageUrl = `https:${imageUrl}`;
+        }
+      } catch (e) {
+        console.error("Error al obtener URL de imagen con Sanity:", e, imageSource);
+        imageUrl = ''; 
+      }
+    }
+    return {
+      src: imageUrl,
+      altText: product.name || 'Imagen del producto' 
+    };
+  });
+
+  // Verificar si hay descripción, si no existe o está vacía, crear una por defecto
+  let description = product.description;
+  if (!description || (Array.isArray(description) && description.length === 0)) {
+    // Crear un bloque de descripción predeterminado en formato PortableText
+    description = [
+      {
+        _type: 'block',
+        style: 'normal',
+        _key: 'default_description',
+        markDefs: [],
+        children: [
+          {
+            _type: 'span',
+            _key: 'default_span',
+            text: 'No hay descripción disponible para este producto.',
+            marks: []
+          }
+        ]
+      }
+    ];
+    console.log("LOG - Se creó una descripción predeterminada porque el producto no tenía ninguna.");
+  } 
+  // Si la descripción es texto plano (string), convertirla al formato PortableText
+  else if (typeof description === 'string') {
+    // Dividir el texto por saltos de línea para mantener el formato
+    const paragraphs = description.split('\n\n');
+    
+    // Crear un array de bloques de PortableText con cada párrafo
+    description = paragraphs.map((paragraph, index) => {
+      // Si el párrafo está vacío, saltar
+      if (!paragraph.trim()) return null;
+      
+      return {
+        _type: 'block',
+        style: 'normal',
+        _key: `converted_paragraph_${index}`,
+        markDefs: [],
+        children: [
+          {
+            _type: 'span',
+            _key: `converted_span_${index}`,
+            text: paragraph,
+            marks: []
+          }
+        ]
+      };
+    }).filter(block => block !== null); // Eliminar bloques nulos
+    
+    console.log("LOG - Se convirtió la descripción de texto plano a formato PortableText.");
+  }
+
   return {
     id: product._id,
     handle: product.slug,
     title: product.name,
-    description: product.description,
+    description: description, // Usar la descripción verificada
     category: product.category || 'otros',
     categoryTitle: product.categoryTitle || 'Otros',
-    featuredImage: {
-      url: imageUrl,
-      altText: product.name
-    },
+    images: processedImages,
     priceRange: {
       maxVariantPrice: {
         amount: product.price.toString(),
-        currencyCode: 'ARS' // Cambiado de USD a ARS
+        currencyCode: 'ARS' 
       }
     }
   };

@@ -28,7 +28,7 @@ function ProductItem({ product, index }: { product: any; index: number }) {
                   amount: product.priceRange.maxVariantPrice.amount,
                   currencyCode: product.priceRange.maxVariantPrice.currencyCode
                 }}
-          src={product.featuredImage.url}
+                src={product.images && product.images.length > 0 ? product.images[0]?.src || '' : ''}
                 fill
                 sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
           priority={index < 3} // Solo cargar con prioridad los primeros 3 productos
