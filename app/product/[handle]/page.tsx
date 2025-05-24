@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { PortableText } from '@portabletext/react';
+import type { Metadata, ResolvingMetadata } from 'next';
 
 import { Gallery } from 'components/product/gallery';
 import { ProductDescription } from 'nextjs-commerce/components/product/product-description';
@@ -9,26 +10,39 @@ import {
   formatSanityProduct,
 } from 'nextjs-commerce/lib/sanity';
 
-// Define una interfaz para la imagen
-interface ProductImage {
-  src: string;
-  alt?: string;
-}
-
-// Definir tipos alineados con lo que espera Next.js 15
-interface PageParams {
+// Define la estructura de tus parámetros de página
+interface PageHandleParams {
   handle: string;
 }
 
-interface MetadataProps {
-  params: Promise<PageParams>;
+// Define una interfaz para la imagen si es necesario para galleryImages
+interface ProductImage {
+  src: string;
+  alt?: string;
+  width?: number;
+  height?: number;
 }
 
-export async function generateMetadata({ params }: MetadataProps) {
+// Props para la función generateMetadata
+interface MetadataProps {
+  params: Promise<PageHandleParams>;
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export async function generateMetadata(
+  { params, searchParams }: MetadataProps,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
   const resolvedParams = await params;
   const productBySlug = await getProductBySlug(resolvedParams.handle);
 
-  if (!productBySlug) return notFound();
+  if (!productBySlug) {
+    notFound(); 
+    return {
+      title: 'Producto no encontrado',
+      description: 'El producto que buscas no existe.',
+    };
+  }
 
   const formattedProduct = formatSanityProduct(productBySlug);
 
@@ -47,8 +61,8 @@ export async function generateMetadata({ params }: MetadataProps) {
       follow: true,
       googleBot: {
         index: true,
-        follow: true
-      }
+        follow: true,
+      },
     },
     openGraph: firstImage
       ? {
@@ -57,38 +71,38 @@ export async function generateMetadata({ params }: MetadataProps) {
               url: firstImage.src,
               width: firstImage.width || 1200,
               height: firstImage.height || 630,
-              alt: firstImage.alt || formattedProduct.title
-            }
-          ]
+              alt: firstImage.alt || formattedProduct.title,
+            },
+          ],
         }
-      : null
+      : null,
   };
 }
 
+// Props para el componente de página
 interface ProductPageProps {
-  params: Promise<PageParams>;
+  params: Promise<PageHandleParams>;
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
   const resolvedParams = await params;
   const productBySlug = await getProductBySlug(resolvedParams.handle);
-  console.log('Debug: productBySlug (raw from Sanity):', JSON.stringify(productBySlug, null, 2));
-
+  
   if (!productBySlug) {
-    notFound();
-    return null;
+    notFound(); 
+    return null; 
   }
 
   const product = formatSanityProduct(productBySlug);
-  console.log('Debug: formattedProduct:', JSON.stringify(product, null, 2));
 
   const productVariants = product.variants || [];
   const productOptions = product.options || [];
 
-  const galleryImages =
-    product.images?.map((image: ProductImage) => ({
+  const galleryImages: Array<{ src: string; altText: string }> =
+    product.images?.map((image: ProductImage) => ({ 
       src: image.src,
-      altText: image.alt || product.title || 'Product image'
+      altText: image.alt || product.title || 'Product image',
     })) || [];
 
   const productJsonLd = {
@@ -101,7 +115,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       '@type': 'Offer',
       price: product.priceRange.maxVariantPrice.amount,
       priceCurrency: product.priceRange.maxVariantPrice.currencyCode,
-      availability: 'https://schema.org/InStock',
+      availability: 'https://schema.org/InStock', 
     },
   };
 
