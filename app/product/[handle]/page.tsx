@@ -9,16 +9,23 @@ import {
   formatSanityProduct,
 } from 'nextjs-commerce/lib/sanity';
 
+// Define una interfaz para la imagen
+interface ProductImage {
+  src: string;
+  alt?: string;
+}
+
 type Params = {
   handle: string;
 };
 
 interface MetadataProps {
-  params: Params;
+  params: Promise<Params> | Params;
 }
 
 export async function generateMetadata({ params }: MetadataProps) {
-  const productBySlug = await getProductBySlug(params.handle);
+  const resolvedParams = 'then' in params ? await params : params;
+  const productBySlug = await getProductBySlug(resolvedParams.handle);
 
   if (!productBySlug) return notFound();
 
@@ -58,11 +65,12 @@ export async function generateMetadata({ params }: MetadataProps) {
 }
 
 interface ProductPageProps {
-  params: Params;
+  params: Promise<Params> | Params;
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const productBySlug = await getProductBySlug(params.handle);
+  const resolvedParams = 'then' in params ? await params : params;
+  const productBySlug = await getProductBySlug(resolvedParams.handle);
   console.log('Debug: productBySlug (raw from Sanity):', JSON.stringify(productBySlug, null, 2));
 
   if (!productBySlug) {
@@ -77,7 +85,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const productOptions = product.options || [];
 
   const galleryImages =
-    product.images?.map((image) => ({
+    product.images?.map((image: ProductImage) => ({
       src: image.src,
       altText: image.alt || product.title || 'Product image'
     })) || [];
