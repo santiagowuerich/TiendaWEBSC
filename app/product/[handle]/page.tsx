@@ -15,16 +15,17 @@ interface ProductImage {
   alt?: string;
 }
 
-type Params = {
+// Definir tipos alineados con lo que espera Next.js 15
+interface PageParams {
   handle: string;
-};
+}
 
 interface MetadataProps {
-  params: Promise<Params> | Params;
+  params: Promise<PageParams>;
 }
 
 export async function generateMetadata({ params }: MetadataProps) {
-  const resolvedParams = 'then' in params ? await params : params;
+  const resolvedParams = await params;
   const productBySlug = await getProductBySlug(resolvedParams.handle);
 
   if (!productBySlug) return notFound();
@@ -65,11 +66,11 @@ export async function generateMetadata({ params }: MetadataProps) {
 }
 
 interface ProductPageProps {
-  params: Promise<Params> | Params;
+  params: Promise<PageParams>;
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const resolvedParams = 'then' in params ? await params : params;
+  const resolvedParams = await params;
   const productBySlug = await getProductBySlug(resolvedParams.handle);
   console.log('Debug: productBySlug (raw from Sanity):', JSON.stringify(productBySlug, null, 2));
 
