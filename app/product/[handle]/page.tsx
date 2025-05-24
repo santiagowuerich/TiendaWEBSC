@@ -2,16 +2,23 @@ import React, { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { PortableText } from '@portabletext/react';
 
-import { Gallery } from '../../components/product/gallery';
-import { ProductDescription } from '../../nextjs-commerce/components/product/product-description';
+import { Gallery } from 'components/product/gallery';
+import { ProductDescription } from 'nextjs-commerce/components/product/product-description';
 import {
   getProductBySlug,
   formatSanityProduct,
-} from '../../nextjs-commerce/lib/sanity';
+} from 'nextjs-commerce/lib/sanity';
 
-export async function generateMetadata({ params }) {
-  const awaitedParams = await Promise.resolve(params);
-  const productBySlug = await getProductBySlug(awaitedParams.handle);
+type Params = {
+  handle: string;
+};
+
+interface MetadataProps {
+  params: Params;
+}
+
+export async function generateMetadata({ params }: MetadataProps) {
+  const productBySlug = await getProductBySlug(params.handle);
 
   if (!productBySlug) return notFound();
 
@@ -50,14 +57,17 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function ProductPage({ params }) {
-  const awaitedParams = await Promise.resolve(params);
-  const productBySlug = await getProductBySlug(awaitedParams.handle);
+interface ProductPageProps {
+  params: Params;
+}
+
+export default async function ProductPage({ params }: ProductPageProps) {
+  const productBySlug = await getProductBySlug(params.handle);
   console.log('Debug: productBySlug (raw from Sanity):', JSON.stringify(productBySlug, null, 2));
 
   if (!productBySlug) {
     notFound();
-    return;
+    return null;
   }
 
   const product = formatSanityProduct(productBySlug);

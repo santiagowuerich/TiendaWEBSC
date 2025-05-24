@@ -79,7 +79,7 @@ export default async function Page({ params }: PageProps) {
   const product = formatSanityProduct(sanityProductRaw as SanityProductForFormatting);
   
   console.log("LOG 2 - FORMATTED PRODUCT DESCRIPTION:", JSON.stringify(product.description, null, 2));
-  
+
   console.log("LOG 2.1 - ¿Description existe?:", !!product.description);
   console.log("LOG 2.2 - ¿Description es un array?:", Array.isArray(product.description));
   if (Array.isArray(product.description)) {
