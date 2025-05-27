@@ -25,6 +25,7 @@ export default function ProductGridItems({ products }: { products: any[] }) {
               fill
               sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
               className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
+              unoptimized={product.featuredImage?.url?.includes('cdn.sanity.io') === true}
             />
           </div>
         </Link>

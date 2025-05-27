@@ -36,8 +36,8 @@ export function GridTileImage({
       className={clsx(
         'group relative flex h-full w-full items-center justify-center overflow-hidden rounded-lg bg-[#eceff0] dark:bg-neutral-800',
         {
-          'shadow-[0_0_0_2px_#6b7280] dark:shadow-[0_0_0_2px_#6b7280]': active,
-          'shadow-lg hover:shadow-xl transition-shadow duration-300': !active
+          'outline outline-1 outline-[#6b7280] dark:outline-[#6b7280]': active,
+          'hover:outline hover:outline-1 hover:outline-[#e5e7eb] dark:hover:outline-[#404040] transition-all duration-300': !active
         }
       )}
       style={{ contain: 'paint' }} // Optimiza la capa de pintura

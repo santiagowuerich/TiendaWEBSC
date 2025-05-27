@@ -86,7 +86,7 @@ export default async function Page({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
         />
         <div className="max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16">
-          <div className="flex flex-col rounded-2xl bg-[#eceff0] dark:bg-black shadow-lg overflow-hidden md:flex-row">
+          <div className="flex flex-col rounded-2xl bg-[#eceff0] dark:bg-black overflow-hidden md:flex-row">
             <div className="w-full md:w-1/2">
               <Suspense
                 fallback={
@@ -94,7 +94,7 @@ export default async function Page({ params }: PageProps) {
                 }
               >
                 <Gallery
-                  images={[
+                  images={product.images || [
                     {
                       src: product.featuredImage.url || '',
                       altText: product.title,
@@ -113,7 +113,7 @@ export default async function Page({ params }: PageProps) {
 
           {/* Product Description Section - Moved Here */}
           {product.description && (
-            <div className="mt-10 md:mt-12 rounded-xl bg-white dark:bg-neutral-900 p-6 md:p-8 shadow-lg">
+            <div className="mt-10 md:mt-12 rounded-xl bg-white dark:bg-neutral-900 p-6 md:p-8">
               <h2 className="mb-4 text-2xl font-semibold text-neutral-900 dark:text-white">Descripción</h2>
               <div className="prose prose-neutral max-w-none dark:prose-invert">
                 <p className="text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">{product.description}</p>
@@ -175,7 +175,7 @@ async function RelatedProducts({
             <Link
               key={product.handle}
               href={`/product/${product.handle}`}
-              className="group overflow-hidden rounded-2xl bg-[#eceff0] shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+              className="group overflow-hidden rounded-2xl bg-[#eceff0] transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="aspect-square relative bg-[#eceff0]">
                 <GridTileImage

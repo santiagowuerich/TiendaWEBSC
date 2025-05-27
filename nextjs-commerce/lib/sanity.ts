@@ -21,6 +21,8 @@ export interface SanityProduct {
   price: number;
   description?: string;
   imageUrl?: string;
+  images?: any[]; // Agregar soporte para múltiples imágenes
+  processedImages?: string[]; // Añadir el array de imágenes procesadas
 }
 
 export interface FormattedProduct {
@@ -34,6 +36,7 @@ export interface FormattedProduct {
     url: string | undefined;
     altText: string;
   };
+  images: { src: string; altText: string }[]; // Array de imágenes
   priceRange: {
     maxVariantPrice: {
       amount: string;
@@ -82,26 +85,49 @@ async function cachedFetch<T>(
 }
 
 // Procesar la imagen para un producto de manera optimizada
-function processProductImage(product: any) {
+function processProductImages(product: any) {
   try {
-    let imageUrl = '';
-    if (product.image && product.image.asset) {
-      imageUrl = urlFor(product.image).url();
+    let mainImageUrl = '';
+    let processedImages: any[] = [];
+    
+    // Procesar imágenes múltiples si existen
+    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+      processedImages = product.images.map((img: any) => {
+        if (img && img.asset) {
+          let imgUrl = urlFor(img).url();
+          if (imgUrl && !imgUrl.startsWith('http')) {
+            imgUrl = `https:${imgUrl}`;
+          }
+          return imgUrl;
+        }
+        return null;
+      }).filter(Boolean); // Eliminar URLs nulas
       
-      if (imageUrl && !imageUrl.startsWith('http')) {
-        imageUrl = `https:${imageUrl}`;
+      // Usar la primera imagen como imagen principal
+      mainImageUrl = processedImages[0] || '';
+    } 
+    // Fallback a la propiedad image (compatibilidad con versiones anteriores)
+    else if (product.image && product.image.asset) {
+      mainImageUrl = urlFor(product.image).url();
+      
+      if (mainImageUrl && !mainImageUrl.startsWith('http')) {
+        mainImageUrl = `https:${mainImageUrl}`;
       }
+      
+      processedImages = [mainImageUrl];
     }
     
     return {
       ...product,
-      imageUrl
+      imageUrl: mainImageUrl,
+      processedImages
     };
   } catch (error) {
-    console.error('Error al procesar imagen para producto:', product._id, error);
+    console.error('Error al procesar imágenes para producto:', product._id, error);
     return {
       ...product,
-      imageUrl: ''
+      imageUrl: '',
+      processedImages: []
     };
   }
 }
@@ -133,12 +159,12 @@ export async function getAllProducts() {
       price,
       stock,
       description,
-      image
+      images
     }`,
     {},
     { next: { revalidate: 60 } } // Mantener revalidación
   );
-  return products.map(processProductImage);
+  return products.map(processProductImages);
 }
 
 // Función para obtener productos por categoría (sin cachedFetch y con filtro)
@@ -154,13 +180,13 @@ export async function getProductsByCategory(categorySlug: string) {
       price,
       stock,
       description,
-      image
+      images
     }`,
     { categorySlug },
     { next: { revalidate: 60 } } // Revalidación de 60 segundos
   );
   console.log(`[DEBUG] Found ${products.length} products for slug ${categorySlug}`); // Log de salida
-  return products.map(processProductImage);
+  return products.map(processProductImages);
 }
 
 // Función para obtener un producto específico por slug (sin cachedFetch y con filtro)
@@ -176,20 +202,28 @@ export async function getProductBySlug(slug: string) {
       price,
       stock,
       description,
-      image
+      images
     }`,
     { slug },
     { next: { revalidate: 60 } } // Revalidación de 60 segundos
   );
   console.log(`[DEBUG] Found product for slug ${slug}:`, !!product); // Log de salida
   if (!product) return null;
-  return processProductImage(product);
+  return processProductImages(product);
 }
 
 // Función para convertir un producto de Sanity a un formato compatible con la interfaz
 export function formatSanityProduct(product: SanityProduct): FormattedProduct {
   // Asegurarse de que imageUrl no sea null/undefined
   const imageUrl = product.imageUrl || '';
+  
+  // Preparar array de imágenes formateadas
+  const images = product.processedImages && Array.isArray(product.processedImages)
+    ? product.processedImages.map((url: string) => ({
+        src: url,
+        altText: product.name
+      }))
+    : [{ src: imageUrl, altText: product.name }];
   
   return {
     id: product._id,
@@ -202,6 +236,7 @@ export function formatSanityProduct(product: SanityProduct): FormattedProduct {
       url: imageUrl,
       altText: product.name
     },
+    images, // Añadir el array de imágenes formateadas
     priceRange: {
       maxVariantPrice: {
         amount: product.price.toString(),
